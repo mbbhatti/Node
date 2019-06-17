@@ -18,12 +18,6 @@ Get database form here https://github.com/zandoan/turing-backend/tree/master/dat
 - Make database setting in config setting file
 - Mailtrap used to send email and it's auth(user,pwd) can be updated in mail block of setting file as per your.
 
-# Run project
-Use this command on localhost
-- npm start/node app.js: it will provide this url http://localhost:5000 url to run application.
-- npm test: It will use for test cases and you can uncomments console.log() to check api response for couple of main features. 
-- DEBUG=express* node app.js command can also be used to get color detail of application flow in gitbash. 
-
 # Architecture
 - Config contains database, E-mail, auth token and testing config files. 
 - Controllers contains all required application controllers for individual module.
@@ -35,3 +29,9 @@ Use this command on localhost
 
 # Documentation 
 - doc folder contains API-Documentation.pdf
+
+# Run/Test
+Use this command on localhost
+- npm start/node app.js: it will provide this url http://localhost:5000 url to run application.
+- npm test: It will use for test cases and you can uncomments console.log() to check api response for couple of main features. 
+- DEBUG=express* node app.js command can also be used to get color detail of application flow in gitbash. 
