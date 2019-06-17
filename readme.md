@@ -29,7 +29,8 @@ Use this command on localhost
 - Models has base and individual associated table model for business logics.
 - Modules contains custome modules validation, handler and helper files.
 - Routes defines endpoints for all APIs with respect of controllers.
+- test has all test cases for the main functions of the system.
 - app.js used express framework for request/response, routes and database connection.
 
-# Provide clear backend API documentation 
-- Check API detail from API-Documentation.pdf file
+# Documentation 
+- Doc folder contains API-Documentation.pdf
