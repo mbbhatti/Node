@@ -2,9 +2,9 @@
 Node JS based API application.
 
 # Requirements 
-- Node  	V11.11.0
-- Express 	V4.17.1
-- MySql		V5 
+- Node  	v11.11.0
+- Express 	v4.17.1
+- MySql		v5+ 
 
 # Installation 
 Please check you have node installed on your system then download project through this github URL.
