@@ -33,4 +33,4 @@ Use this command on localhost
 - app.js used express framework for request/response, routes and database connection.
 
 # Documentation 
-- Doc folder contains API-Documentation.pdf
+- doc folder contains API-Documentation.pdf
