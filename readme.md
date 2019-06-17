@@ -15,16 +15,17 @@ To get all required packages run this command.
 
 # Configuration
 Get database form here https://github.com/zandoan/turing-backend/tree/master/database
-- Make database setting in configuration setting file
+- Make database setting in config setting file
 - Mailtrap used to send email and it's auth(user,pwd) can be updated in mail block of setting file as per your.
 
 # Run project
 Use this command on localhost
 - npm start/node app.js: it will provide this url http://localhost:5000 url to run application.
-- npm test: It will use for test cases and you can uncomments console.log() to check api response for couple of main features.
+- npm test: It will use for test cases and you can uncomments console.log() to check api response for couple of main features. 
+- DEBUG=express* node app.js command can also be used to get color detail of application flow in gitbash. 
 
 # Architecture
-- Configuration contains database, E-mail, auth token and testing configuration files. 
+- Config contains database, E-mail, auth token and testing config files. 
 - Controllers contains all required application controllers for individual module.
 - Models has base and individual associated table model for business logics.
 - Modules contains custome modules validation, handler and helper files.
