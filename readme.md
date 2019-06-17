@@ -32,6 +32,6 @@ Get database form here https://github.com/zandoan/turing-backend/tree/master/dat
 
 # Run || Test
 Use this command on localhost
-- npm start/node app.js: it will provide this url http://localhost:5000 url to run application.
+- npm start/node app.js: it will provide a url to run application.
 - npm test: It will use for test cases and you can uncomments console.log() to check api response for couple of main features. 
 - DEBUG=express* node app.js command can also be used to get color detail of application flow in gitbash. 
