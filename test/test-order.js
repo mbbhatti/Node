@@ -24,7 +24,7 @@ describe("Orders", function() {
                 //console.log(res.text);
                 res.status.should.equal(200);
             } else {
-                //console.log(res.error.text);
+                console.log(res.error.text);
             }
             done();
         });
