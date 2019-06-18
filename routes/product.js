@@ -1,4 +1,4 @@
-Product = require(__dirname + "/../controllers/Product");
+Product = require(__dirname + "/../app/controllers/Product");
 
 module.exports = function(app, attachSQLDB, next){    
     app.get('/products', attachSQLDB, function(req, res) {      	

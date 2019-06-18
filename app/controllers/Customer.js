@@ -2,7 +2,7 @@ const customerModel = require(__dirname + "/../models/api/CustomerModel");
 const customerValidation = require(__dirname + "/../modules/CustomerValidation");
 const customer = require(__dirname + '/../modules/CustomerHandler');
 const helper = require(__dirname + '/../modules/CustomHelper');
-const auth = require(__dirname + '/../config/auth');
+const auth = require(__dirname + '/../../config/auth');
 const v = require('node-input-validator');
 const jwt = require('jsonwebtoken');
 
@@ -34,7 +34,7 @@ module.exports = {
 		    	};
 				
 				// Set query condition       				
-				var where = 'email = "'+data.email+'" and password = "'+data.passwor+'"';
+				var where = 'email = "'+data.email+'" and password = "'+data.password+'"';
 
 				// DB read process 
 				customerModel.setDB(req.db);		    	

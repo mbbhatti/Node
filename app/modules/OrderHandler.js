@@ -1,4 +1,4 @@
-const config = require(__dirname + "/../config/setting")();
+const config = require(__dirname + "/../../config/setting")();
 const nodeMailer = require('nodemailer');
 
 /* 

@@ -1,4 +1,4 @@
-Order = require(__dirname + "/../controllers/Order");
+Order = require(__dirname + "/../app/controllers/Order");
 
 module.exports = function(app, attachSQLDB, next){    
     app.post('/orders', attachSQLDB, function(req, res) {    	

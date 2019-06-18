@@ -1,4 +1,4 @@
-ShoppingCart = require(__dirname + "/../controllers/ShoppingCart");
+ShoppingCart = require(__dirname + "/../app/controllers/ShoppingCart");
 
 module.exports = function(app, attachSQLDB, next){    
     app.post('/shoppingcart/add', attachSQLDB, function(req, res) {    	

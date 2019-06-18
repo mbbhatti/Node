@@ -1,6 +1,6 @@
 const stripeValidation = require(__dirname + "/../modules/StripeValidation");
 const helper = require(__dirname + '/../modules/CustomHelper');
-const config = require(__dirname + "/../config/stripe");
+const config = require(__dirname + "/../../config/stripe");
 const stripe = require("stripe")(config.stripe.secretkey);
 const v = require('node-input-validator');
 

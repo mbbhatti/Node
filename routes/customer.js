@@ -1,4 +1,4 @@
-Customer = require(__dirname + "/../controllers/Customer");
+Customer = require(__dirname + "/../app/controllers/Customer");
 
 module.exports = function(app, attachSQLDB, next){    
     app.post('/customers/login', attachSQLDB, function(req, res) {    	

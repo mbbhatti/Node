@@ -19,10 +19,11 @@ Get database form here https://github.com/zandoan/turing-backend/tree/master/dat
 - Mailtrap used to send email and it's auth(user,pwd) can be updated in mail block of setting file as per your.
 
 # Architecture
+- app/Controllers contains all required application controllers for individual module.
+- app/Models has base and individual associated table model for business logics.
+- app/Modules contains custome modules validation, handler and helper files.
 - Config contains database, E-mail, auth token and testing config files. 
-- Controllers contains all required application controllers for individual module.
-- Models has base and individual associated table model for business logics.
-- Modules contains custome modules validation, handler and helper files.
+- doc file cantains application documents
 - Routes defines endpoints for all APIs with respect of controllers.
 - test has all test cases for the main functions of the system.
 - app.js used express framework for request/response, routes and database connection.
