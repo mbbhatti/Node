@@ -31,12 +31,12 @@ module.exports = {
 
 				if(token == "" || token == undefined) {
 					output = {
-						'status': 204,
+						'status': 401,
 						'code': 'AUT_01',
 						'message': 'Authorization code is empty',
 						'field': 'USER-KEY'
 					};	
-					helper.display(res, output, 204);
+					helper.display(res, output, 401);
 				} else {		
 					token = token.split(/\s+/).pop();
 					jwt.verify(token, auth.token.secret, function(err, decoded) {
