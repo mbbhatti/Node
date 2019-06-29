@@ -5,22 +5,14 @@ class OrderValidation
 {
     message(data) 
     {
-        if (data.cart_id !== undefined) {
-            if (data.cart_id.rule === "required") {
+        if (data.cart_id !== undefined && 
+            data.cart_id.rule === "required") {
                 return {
                     'status': 400,
                     'code': 'OR_01',
                     'message': 'The cart ID is required.',
                     'field': 'cart_id'
-                }
-            } else if (data.cart_id.rule === "integer") {
-                return {
-                    'status': 400,
-                    'code': 'OR_02',
-                    'message': 'The cart ID is not number.',
-                    'field': 'cart_id'
-                }
-            }
+                }            
         } else if (data.shipping_id !== undefined) {
             if (data.shipping_id.rule === "required") {
                 return {

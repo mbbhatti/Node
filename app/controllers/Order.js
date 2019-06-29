@@ -1,5 +1,6 @@
 const shoppingCartModel = require(__dirname + "/../models/api/ShoppingCartModel");
 const orderModel = require(__dirname + "/../models/api/OrderModel");
+const orderDetailModel = require(__dirname + "/../models/api/OrderDetailModel");
 const orderValidation = require(__dirname + "/../modules/OrderValidation");
 const order = require(__dirname + '/../modules/OrderHandler');
 const helper = require(__dirname + '/../modules/CustomHelper');
@@ -16,7 +17,7 @@ module.exports = {
     { 
     	// Set validation rule
     	let validator = new v( req.body, {
-	        cart_id 	:'required|integer',
+	        cart_id 	:'required',
 	        shipping_id	:'required|integer',
 	        tax_id  	:'required|integer'
 	    });
@@ -49,34 +50,71 @@ module.exports = {
 							};
 							helper.display(res, output, 401);
 					  	} else {					  		
-					  		// DB read product id and price 
+					  		// DB get shopping cart and product data 
 					    	shoppingCartModel.setDB(req.db);	    						    				    	
 					    	shoppingCartModel.getCartById(req.body.cart_id, function(err, cartData) {					    				
-					    		if(!err && cartData !== undefined) {
+					    		if(!err && cartData !== undefined && cartData.length > 0) {
+
+					    			// Caculate total price with quantity
+					    			let total_amount = 0;
+					    			let total_entries = -1;
+					    			for (let i = 0; i < cartData.length; i++) {
+					    				total_amount +=(cartData[i].price * cartData[i].quantity);	
+					    				total_entries ++; 				    				
+					    			}				    			
+
 					    			// Set Date and time
 					    			var now = new Date();
 					    			dateTime = df(now, "yyyy-mm-dd HH-MM-ss");
 
-					    			// Setting new customer data
-						        	var data = {
-										total_amount	: cartData.price,
+					    			// Setting order data
+						        	var order_data = {
+										total_amount	: total_amount,
 							    		customer_id		: decoded.data.customer_id,
 							    		shipping_id		: req.body.shipping_id,
 							    		tax_id			: req.body.tax_id,
+							    		status			: 1,
 							    		created_on		: dateTime,
 							    		shipped_on		: dateTime
 							    	};
 
-							    	// DB write record
+							    	// DB add order
 							    	orderModel.setDB(req.db);
-					    			orderModel.insertRow(data, 'order_id', function(err, record) {					
-										if (!err) {											
-									  		// send Order confirmation email											
-											order.sendEmail(res, decoded, record, helper);
+					    			orderModel.insertRow(order_data, 'order_id', function(err, ord_res) {					
+										if (!err) {
+											orderDetailModel.setDB(req.db);
+											orderDetailModel.insertOrderDetail(cartData, ord_res, function(err, det_res) {
+												if (!err) {
+
+													let where  = "cart_id = '" + req.body.cart_id + "'";
+													
+													// DB delete shopping cart entry 
+											    	shoppingCartModel.setDB(req.db);	    	
+										        	shoppingCartModel.deleteRow(where, function(err, response) {	        		
+														if (!err) {				
+															// send Order confirmation email											
+															order.sendEmail(res, decoded, ord_res, helper);														
+														}
+													});													
+												} else {
+													var msg = '';
+													if(det_res.original !== undefined) {
+														msg = det_res.original.sqlMessage;		
+													}
+
+													output = {
+														'status': 400,
+														'code': 'OR_04',
+														'message': msg,
+														'field': 'DB'
+													};						
+													helper.display(res, output);
+												}
+											});						  		
 										} else {
 											var msg = '';
-											if(record.original !== undefined) {
-												msg = record.original.sqlMessage;		
+											if(ord_res.original !== undefined) {
+												msg = ord_res.original.sqlMessage;		
 											}
 
 											output = {

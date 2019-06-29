@@ -52,7 +52,11 @@ model.getCartById = function(cid, callback) {
 
     let sql = `
         SELECT
+          sc.item_id,
+          sc.attributes,
+          sc.quantity,
           p.product_id, 
+          p.name,
           p.price
         FROM
            ` + table + ` AS sc
@@ -61,8 +65,29 @@ model.getCartById = function(cid, callback) {
         ON
           p.product_id = sc.product_id
         WHERE
-          sc.cart_id = ` + cid;
+          sc.cart_id = '` + cid + `'`;
 
+    this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+        callback(false, dbRes);
+    }).catch(err => {
+        callback(false, err);
+    });
+}
+
+/* 
+ * Check duplicate cart
+ *
+ * @param where condition
+ * @param callback function
+ *
+ * return object 
+ */
+model.checkDuplicate = function(where, callback) {
+
+    var sql = "SELECT item_id as id, quantity FROM " 
+            + table 
+            + " WHERE " + where;
+    
     this.db.query(sql).then(dbRes => {
         callback(false, dbRes[0][0]);
     }).catch(err => {

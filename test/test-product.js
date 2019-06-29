@@ -7,9 +7,9 @@ var server = supertest.agent(testConfig.test.server);
 
 describe("Product", function() {
 
-    it("all", function(done) {
+    it("all default", function(done) {
         server
-        .get('/products?page=1&limit=1&description_length=10')
+        .get('/products')
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
@@ -23,9 +23,9 @@ describe("Product", function() {
         });
     });
 
-    it("Search", function(done) {
+    it("all with page number", function(done) {
         server
-        .get('/products/search?query_string=beautiful stamp')
+        .get('/products?page=1')
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
@@ -39,9 +39,10 @@ describe("Product", function() {
         });
     });
 
-    it("Products by category id", function(done) {
+    it("all with page and limit", function(done) {
         server
-        .get('/products/inCategory/1')
+        .get('/products?page=1&limit=5')
+        .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
             if (res.error == false) {
@@ -54,9 +55,10 @@ describe("Product", function() {
         });
     });
 
-    it("Products by department id", function(done) {
+    it("all with page, limit and description length", function(done) {
         server
-        .get('/products/inDepartment/1')
+        .get('/products?page=1&limit=3&description_length=10')
+        .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
             if (res.error == false) {
@@ -69,9 +71,74 @@ describe("Product", function() {
         });
     });
 
-    it("Products view", function(done) {
+    it("Search without query string", function(done) {
         server
-        .get('/products/1/details')
+        .get('/products/search')
+        .expect("Content-type", /x-www-form-urlencoded/)
+        .expect(200)
+        .end(function(err, res) {
+            if (res.error == false) {
+                //console.log(res.text);
+                res.status.should.equal(200);
+            } else {
+                //console.log(res.error.text);
+            }
+            done();
+        });
+    });
+
+    it("Search with query string", function(done) {
+        server
+        .get('/products/search?query_string=italian')
+        .expect("Content-type", /x-www-form-urlencoded/)
+        .expect(200)
+        .end(function(err, res) {
+            if (res.error == false) {
+                //console.log(res.text);
+                res.status.should.equal(200);
+            } else {
+                //console.log(res.error.text);
+            }
+            done();
+        });
+    });
+
+    it("Search with query string and page", function(done) {
+        server
+        .get('/products/search?query_string=italian&page=1')
+        .expect("Content-type", /x-www-form-urlencoded/)
+        .expect(200)
+        .end(function(err, res) {
+            if (res.error == false) {
+                //console.log(res.text);
+                res.status.should.equal(200);
+            } else {
+                //console.log(res.error.text);
+            }
+            done();
+        });
+    });
+
+    it("Search with query string, page and limit", function(done) {
+        server
+        .get('/products/search?query_string=italian&page=1&limit=2')
+        .expect("Content-type", /x-www-form-urlencoded/)
+        .expect(200)
+        .end(function(err, res) {
+            if (res.error == false) {
+                //console.log(res.text);
+                res.status.should.equal(200);
+            } else {
+                //console.log(res.error.text);
+            }
+            done();
+        });
+    });
+
+    it("Search with query string, page, limit and description length", function(done) {
+        server
+        .get('/products/search?query_string=italian&page=1&limit=2&description_length=5')
+        .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
             if (res.error == false) {

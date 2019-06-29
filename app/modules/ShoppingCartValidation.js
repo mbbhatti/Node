@@ -5,22 +5,15 @@ class ShoppingCartValidation
 {
     message(data) 
     {
-        if (data.cart_id !== undefined) {
-            if (data.cart_id.rule === "required") {
-                return {
-                    'status': 400,
-                    'code': 'SC_01',
-                    'message': 'The cart ID is required.',
-                    'field': 'cart_id'
-                }
-            } else if (data.cart_id.rule === "integer") {
-                return {
-                    'status': 400,
-                    'code': 'SC_02',
-                    'message': 'The cart ID is not number.',
-                    'field': 'cart_id'
-                }
+        if (data.cart_id !== undefined && 
+            data.cart_id.rule === "required") {
+            return {
+                'status': 400,
+                'code': 'SC_01',
+                'message': 'The cart ID is required.',
+                'field': 'cart_id'
             }
+            
         } else if (data.product_id !== undefined) {
             if (data.product_id.rule === "required") {
                 return {

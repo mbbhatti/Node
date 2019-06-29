@@ -1,16 +1,15 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var Sequelize = require('sequelize');
+var config = require('./config/setting')();
 
 module.exports = {
 	name: "Backend",
 	run: function() {
 
-        app = express();        
-        app.set('dbtype', 'mysql');
-        
+        app = express();                
         app.use(bodyParser.urlencoded({extended: true}));
         app.use(bodyParser.json());
-        app.use(express.static(__dirname + '/public'));
         
         var port = Number(process.env.PORT || 5000);
         app.listen(port, function() {
@@ -22,19 +21,13 @@ module.exports = {
     routes: function(app) { 
         var next = function(req, res) {
             console.log('next(req, res)');
-        }                
-
-        var config = require('./config/setting')(); 
-
-        if (app.get('dbtype') == 'mysql') {     
-            var Sequelize = require('sequelize');
-            
-            var sqldb = new Sequelize(config.mysql.db, config.mysql.user, config.mysql.password, {
-                dialect: "mysql",
-                host: config.mysql.host,
-                port: config.mysql.port
-            });
         }
+
+        var sqldb = new Sequelize(config.mysql.db, config.mysql.user, config.mysql.password, {
+            dialect: "mysql",
+            host: config.mysql.host,
+            port: config.mysql.port
+        });
 
         var attachSQLDB = function(req, res, next)
         {            
