@@ -29,7 +29,7 @@ Get database form here https://github.com/zandoan/turing-backend/tree/master/dat
 - app.js used express framework for request/response, routes and database connection.
 
 # Documentation 
-- doc folder contains API-Documentation.pdf
+- https://github.com/mbbhatti/turing/blob/master/doc/API-Documentation.pdf
 
 # Run || Test
 Use this command on localhost
