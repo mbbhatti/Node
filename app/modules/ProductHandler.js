@@ -17,7 +17,7 @@ var find = function(req, res, productModel, cstHelper)
     var limit = (req.query.limit == undefined || req.query.limit == '') 
                 ? 20 :req.query.limit;
     var desLen = (req.query.description_length == undefined  || req.query.description_length == '') 
-                ? 0 :req.query.description_length;
+                ? 200 :req.query.description_length;
     var did = (req.params.department_id == undefined  || req.query.department_id == '') 
                 ? '' : req.params.department_id;  
     var cid = (req.params.category_id == undefined || req.query.category_id == '') 

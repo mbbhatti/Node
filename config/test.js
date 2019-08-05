@@ -1,6 +1,6 @@
 var test = {
 	server: "http://localhost:5000",
-    token: 'Use cutomer Bearer token'
+    token: 'Use for Bearer token'
 }
 
 exports.test = test;

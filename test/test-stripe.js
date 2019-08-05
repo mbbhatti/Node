@@ -5,20 +5,64 @@ var testConfig = require(__dirname + '/../config/test');
 // PORT reference, where program is runninng.
 var server = supertest.agent(testConfig.test.server);
 
-describe("Orders", function() {    
+describe("Stripe Charge", function() {
 
-    it("Create order", function(done) {
+    it("Stripe charge without token", function(done) {
+        server
+        .post('/stripe/charge')
+        .send({
+            stripeToken: '',
+            order_id: 1,
+            description: 'Testing',
+            amount: 100
+        })
+        .expect("Content-type", /x-www-form-urlencoded/)
+        .expect(200)
+        .end(function(err, res) {
+            if (res.error == false) {
+                //console.log(res.text);
+                res.status.should.equal(200);
+            } else {
+                //console.log(res.error.text);
+            }
+            done();
+        });
+    });
+
+    it("Stripe charge without order id", function(done) {
+        server
+        .post('/stripe/charge')
+        .send({
+            stripeToken: 'tok_visa',
+            order_id: '',
+            description: 'Testing',
+            amount: 100
+        })
+        .expect("Content-type", /x-www-form-urlencoded/)
+        .expect(200)
+        .end(function(err, res) {
+            if (res.error == false) {
+                //console.log(res.text);
+                res.status.should.equal(200);
+            } else {
+                //console.log(res.error.text);
+            }
+            done();
+        });
+    });
+
+    it("Stripe charge inavlid amount", function(done) {
         this.timeout(50000);
         server
-        .post('/orders')
+        .post('/stripe/charge')
         .send({
-            cart_id: 'w5krev4nf02',
-            shipping_id: 1,
-            tax_id: 1
+            stripeToken: 'tok_visa',
+            order_id: 1,
+            description: 'Testing',
+            amount: 10
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);
@@ -30,17 +74,18 @@ describe("Orders", function() {
         });
     });
 
-    it("Create order with wrong cart id", function(done) {
+    it("Stripe charge complete", function(done) {
+        this.timeout(50000);
         server
-        .post('/orders')
+        .post('/stripe/charge')
         .send({
-            cart_id: 'abc123',
-            shipping_id: 1,
-            tax_id: 1
+            stripeToken: 'tok_visa',
+            order_id: 1,
+            description: 'Testing',
+            amount: 100
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);
@@ -50,49 +95,5 @@ describe("Orders", function() {
             }
             done();
         });
-    });
-
-    it("Create order with wrong shipping id", function(done) {
-        server
-        .post('/orders')
-        .send({
-            cart_id: 1,
-            shipping_id: 'ab',
-            tax_id: 1
-        })
-        .expect("Content-type", /x-www-form-urlencoded/)
-        .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
-        .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
-                res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
-            }
-            done();
-        });
-    });
-
-    it("Create order with wrong tax id", function(done) {
-        server
-        .post('/orders')
-        .send({
-            cart_id: 1,
-            shipping_id: 1,
-            tax_id: 'abc'
-        })
-        .expect("Content-type", /x-www-form-urlencoded/)
-        .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
-        .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
-                res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
-            }
-            done();
-        });
-    });
+    });    
 });
