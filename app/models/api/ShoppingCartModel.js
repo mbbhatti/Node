@@ -4,7 +4,7 @@ const table = 'shopping_cart';
 model = new Model();
 model.table_name = table;
 
-/* 
+/**
  * Get last inserted cart
  *
  * @param data for cart id
@@ -46,7 +46,7 @@ model.getLastCart = function(data, callback) {
     });
 }
 
-/* 
+/**
  * Get cart data by id
  *
  * @param cid for cart id
@@ -86,7 +86,7 @@ model.getCartById = function(cid, callback) {
     });
 }
 
-/* 
+/**
  * Check duplicate cart
  *
  * @param where condition

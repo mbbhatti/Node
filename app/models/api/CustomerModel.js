@@ -4,7 +4,7 @@ const table = 'customer';
 model = new Model();
 model.table_name = table;
 
-/* 
+/**
  * User Auth
  *
  * @param data      use for customer info
@@ -45,7 +45,7 @@ model.auth = function(req, callback) {
     });
 }
 
-/* 
+/**
  * Get last inserted customer record
  * Removes password field from result
  *

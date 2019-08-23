@@ -4,7 +4,7 @@ const table = 'order_detail';
 model = new Model();
 model.table_name = table;
 
-/* 
+/**
  * Bulk insert order detail
  *
  * @param data 

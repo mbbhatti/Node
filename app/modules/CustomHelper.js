@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-/* 
+/**
  * Created encrypted password
  *
  * @param pwd 
@@ -15,7 +15,7 @@ enCryptPassword = function(pwd, salt) {
 
 exports.enCryptPassword = enCryptPassword;
 
-/* 
+/**
  * Manage response
  *
  * @param res 

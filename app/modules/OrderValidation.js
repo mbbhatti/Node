@@ -1,4 +1,4 @@
-/* 
+/**
 * Order validation 
 */
 class OrderValidation 

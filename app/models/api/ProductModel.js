@@ -4,7 +4,7 @@ const table = 'product';
 model = new Model();
 model.table_name = table;
 
-/* 
+/**
  * Get product by id
  *
  * @param pid       use for product id
@@ -41,7 +41,7 @@ model.getById = function(pid, callback) {
     });
 };
 
-/* 
+/**
  * Get all products
  *
  * @param page      it represents page number
@@ -102,7 +102,7 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
     });
 };
 
-/* 
+/**
  * Get all products
  *
  * @param page      it represents page number

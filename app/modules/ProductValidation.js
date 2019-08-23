@@ -1,4 +1,4 @@
-/* 
+/**
 * Product validation
 */
 class ProductValidation 

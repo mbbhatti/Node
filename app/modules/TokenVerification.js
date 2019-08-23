@@ -1,4 +1,4 @@
-/* 
+/**
  * Verify USER-KEY bearer token
  *
  * @param req

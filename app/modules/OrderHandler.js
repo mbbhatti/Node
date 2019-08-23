@@ -1,7 +1,6 @@
-//const config = require(__dirname + "/../../config/setting")();
 const nodeMailer = require('nodemailer');
 
-/* 
+/**
  * Send order confirmation email
  * 
  * @param res 

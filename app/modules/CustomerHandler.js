@@ -1,4 +1,4 @@
-/* 
+/**
  * Update customer record
  *
  * @param req

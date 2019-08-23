@@ -1,4 +1,4 @@
-/* 
+/**
 * Shopping cart validation
 */
 class ShoppingCartValidation 

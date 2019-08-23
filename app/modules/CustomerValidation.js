@@ -1,4 +1,4 @@
-/* 
+/**
 * Customer validation 
 */
 class CustomerValidation 

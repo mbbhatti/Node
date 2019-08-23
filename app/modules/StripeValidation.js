@@ -1,4 +1,4 @@
-/* 
+/**
 * Stripe validation 
 */
 class StripeValidation 
