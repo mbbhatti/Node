@@ -1,10 +1,11 @@
 /**
  * Find data
- * 
- * @param req 
- * @param res 
- * @param productModel  product model object
- * @param cstHelper     use for response message
+ * Used page number, record limit and description length
+ *
+ * @param {object} req express request object
+ * @param {object} res express response object
+ * @param {object} productModel product model object
+ * @param {object} cstHelper response message
  *
  * @return object
  */

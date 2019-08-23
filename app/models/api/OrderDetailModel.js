@@ -7,9 +7,9 @@ model.table_name = table;
 /**
  * Bulk insert order detail
  *
- * @param data 
- * @param order
- * @param callback function
+ * @param {object} data object
+ * @param {object} order object
+ * @param {function} callback response object
  *
  * @return object 
  */

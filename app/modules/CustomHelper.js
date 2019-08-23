@@ -3,8 +3,8 @@ const crypto = require('crypto');
 /**
  * Created encrypted password
  *
- * @param pwd 
- * @param salt
+ * @param {string} pwd 
+ * @param {string} salt
  *
  * @return string 
  */
@@ -18,9 +18,9 @@ exports.enCryptPassword = enCryptPassword;
 /**
  * Manage response
  *
- * @param res 
- * @param message 
- * @param errCode
+ * @param {object} res express response object
+ * @param {string} message information string
+ * @param {integer} errCode status response
  *
  * @return object 
  */

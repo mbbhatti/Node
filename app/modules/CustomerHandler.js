@@ -1,13 +1,12 @@
 /**
  * Update customer record
  *
- * @param req
- * @param res 
- * @param cid           Indicates customer id
- * @param data          Modified customer data 
- * @param customerModel customer model object
- * @param cstHelper     use for response message
- * @param callback      function
+ * @param {object} req express request object
+ * @param {object} res express response object
+ * @param {inetger} cid indicates customer id
+ * @param {object} data customer 
+ * @param {object} customerModel customer model object
+ * @param {object} cstHelper response message
  *
  * @return object
  */

@@ -7,8 +7,8 @@ model.table_name = table;
 /**
  * Get last inserted cart
  *
- * @param data for cart id
- * @param callback function
+ * @param {object} data shopping cart request object
+ * @param {function} callback response object
  *
  * @return object 
  */
@@ -49,8 +49,8 @@ model.getLastCart = function(data, callback) {
 /**
  * Get cart data by id
  *
- * @param cid for cart id
- * @param callback function
+ * @param {integer} cid shopping cart id
+ * @param {function} callback response object
  *
  * @return object 
  */
@@ -89,8 +89,8 @@ model.getCartById = function(cid, callback) {
 /**
  * Check duplicate cart
  *
- * @param where condition
- * @param callback function
+ * @param {string} where condition request string
+ * @param {function} callback response object
  *
  * @return object 
  */

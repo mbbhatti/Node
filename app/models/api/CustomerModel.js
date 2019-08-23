@@ -7,8 +7,8 @@ model.table_name = table;
 /**
  * User Auth
  *
- * @param data      use for customer info
- * @param callback  use as function
+ * @param {object} req customer info object
+ * @param {function} callback response object
  *
  * @return string|object 
  */
@@ -49,8 +49,8 @@ model.auth = function(req, callback) {
  * Get last inserted customer record
  * Removes password field from result
  *
- * @param data for customer id
- * @param callback function
+ * @param {object} data customer id
+ * @param {function} callback response object
  *
  * @return string|object 
  */

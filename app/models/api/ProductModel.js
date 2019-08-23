@@ -7,8 +7,8 @@ model.table_name = table;
 /**
  * Get product by id
  *
- * @param pid       use for product id
- * @param callback  use as function
+ * @param {integer} pid product id
+ * @param {function} callback response object
  *
  * @return object 
  */
@@ -44,11 +44,11 @@ model.getById = function(pid, callback) {
 /**
  * Get all products
  *
- * @param page      it represents page number
- * @param limit     it indicates limit per page
- * @param desLen    it used for description length
- * @param qs        use for query string
- * @param callback  use as function
+ * @param {integer} page request number
+ * @param {integer} limit request record limit
+ * @param {integer} desLen request description length
+ * @param {string} qs request search string
+ * @param {function} callback response object
  *
  * @return object 
  */
@@ -103,14 +103,14 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
 };
 
 /**
- * Get all products
+ * Get categoty or department based products
  *
- * @param page      it represents page number
- * @param limit     it indicates limit per page
- * @param desLen    it used for description length
- * @param cid       use for category id
- * @param did       use for department id
- * @param callback  use as function
+ * @param {integer} page request number
+ * @param {integer} limit request record limit
+ * @param {integer} desLen request description length
+ * @param {integer} cid category id
+ * @param {integer} did department id
+ * @param {function} callback response object
  *
  * @return object 
  */

@@ -3,10 +3,10 @@ const nodeMailer = require('nodemailer');
 /**
  * Send order confirmation email
  * 
- * @param res 
- * @param customer  has customer data
- * @param product   has product data
- * @param helper use for response message 
+ * @param {object} res express response object
+ * @param {object} customer has customer data
+ * @param {object} product contains product data
+ * @param {object} helper response message
  *
  * @return object
  */

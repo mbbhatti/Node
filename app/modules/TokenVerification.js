@@ -1,10 +1,9 @@
 /**
  * Verify USER-KEY bearer token
  *
- * @param req
- * @param res 
- * @param jwt       used for json web token
- * @param callback  function
+ * @param {object} req express request object
+ * @param {object} res express response object
+ * @param {object} jwt json web token object
  *
  * @return object 
  */
