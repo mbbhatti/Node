@@ -4,15 +4,15 @@ module.exports = function(db) {
 module.exports.prototype = {
     table_name: '',
     extend: function(properties) {
-        var Child = module.exports;
+        Child = module.exports;
         Child.prototype = module.exports.prototype;
-        for (var key in properties) {
+        for (key in properties) {
             Child.prototype[key] = properties[key];
         }
         return Child;
     },
     inherits: function(child, properties) {
-        for (var key in properties) {
+        for (key in properties) {
             child.key = properties[key];
         }
         return child;
@@ -22,10 +22,10 @@ module.exports.prototype = {
     },
     prepareInsertQuery: function(dataArray, table_name) {
 
-        var fields = '';
-        var values = '';
-        var sql = '';
-        for (var item in dataArray) {
+        fields = '';
+        values = '';
+        sql = '';
+        for (item in dataArray) {
             //-- Dont add space after comma
             fields = fields.concat(item + ',');
 
@@ -44,7 +44,7 @@ module.exports.prototype = {
     },
     prepareAttributes: function(attr) {
 
-        var selection = '';
+        selection = '';
         for (i = 0; i < attr.length; i++) {
             //-- Dont add space after comma for formatting it is part of logic
             selection = selection.concat(attr[i] + ','); 
@@ -57,16 +57,16 @@ module.exports.prototype = {
 
     },
     insertRow: function(data, attr, callback) {
-        var self = this;
+        self = this;
         sql = self.prepareInsertQuery(data, self.table_name);
 
         this.db.query(sql).then(() => {
             sql = "SELECT MAX(" + attr + ") as id FROM " + self.table_name;
-            self.db.query(sql).then(dbRes => {
+            self.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
                 if (dbRes.length > 0) {
-                    callback(false, dbRes[0][0]);
+                    callback(false, dbRes[0]);
                 } else {
-                    callback(false, '');
+                    callback(true, 'No record found');
                 }
             }).catch(err => {
                 callback(true, err);
@@ -76,7 +76,7 @@ module.exports.prototype = {
         });
     },
     getRow: function(attr, where, callback) {
-        var type = typeof attr;
+        type = typeof attr;
         if (type == "object") {
             attr = this.prepareAttributes(attr);
         }
@@ -86,9 +86,9 @@ module.exports.prototype = {
             where = '';
         }
 
-        var sql = "SELECT " + attr + " FROM " + this.table_name + " " + where;
-        this.db.query(sql).then(dbRes => {
-            let data = dbRes[0][0];
+        sql = "SELECT " + attr + " FROM " + this.table_name + " " + where;
+        this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+            data = dbRes[0];
             delete data.password;
             callback(false, data);
         }).catch(err => {
@@ -98,8 +98,8 @@ module.exports.prototype = {
     },
     updateRow: function(data, where, callback) {
 
-        var update_attr = '';
-        var type = typeof data;
+        update_attr = '';
+        type = typeof data;
 
         if (where != '' || where != 'undefined' || where != null) {
             where = " WHERE " + where
@@ -108,7 +108,7 @@ module.exports.prototype = {
         }
 
         if (type == "object") {
-            for (var item in data) {
+            for (item in data) {
                 //-- Dont add space after comma
                 update_attr = update_attr.concat(item + "='" + data[item] + "',"); 
             }
@@ -122,9 +122,9 @@ module.exports.prototype = {
         sql = "UPDATE " + this.table_name + " SET " + update_attr + " " + where;
         this.db.query(sql).then(() => {
             sql = "SELECT * FROM " + this.table_name + where;
-            this.db.query(sql).then(dbRes => {
+            this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
                 if (dbRes.length > 0) {
-                    let data = dbRes[0][0];
+                    data = dbRes[0];
                     delete data.password;
                     callback(false, data);
                 } else {
@@ -144,7 +144,8 @@ module.exports.prototype = {
         } else {
             callback(true);
         }
-        var sql = "DELETE  FROM " + this.table_name + " " + where;
+        
+        sql = "DELETE  FROM " + this.table_name + " " + where;
         this.db.query(sql).then(dbRes => {
             if (dbRes[0].affectedRows > 0) {
                 callback(false, '');

@@ -1,9 +1,9 @@
 var supertest = require("supertest");
 var should = require("should");
-var testConfig = require(__dirname + '/../config/test');
+const dotenv = require('dotenv').config();
 
 // PORT reference, where program is runninng.
-var server = supertest.agent(testConfig.test.server);
+var server = supertest.agent(process.env.APP_URL +':'+ process.env.APP_PORT);
 
 describe("Customer", function() {
 
@@ -16,7 +16,7 @@ describe("Customer", function() {
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
-        .end(function(err, res) {
+        .end(function(err, res) {            
             if (res.error == false) {
                 //console.log(res.text);
                 res.status.should.equal(200);
@@ -27,7 +27,7 @@ describe("Customer", function() {
         });
     });
 
-    it("Login woth wrong email", function(done) {
+    it("Login with wrong email", function(done) {
         server
         .post('/customers/login')
         .send({
@@ -112,7 +112,7 @@ describe("Customer", function() {
         .post('/customers')
         .send({
             name: "abc",
-            email: 'mbbhatti@xyz.com',
+            email: 'mbbhatti@wxyz.com',
             password: '123456'
         })
         .expect("Content-type", /x-www-form-urlencoded/)

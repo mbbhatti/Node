@@ -1,20 +1,20 @@
-var Model = require(__dirname + "/../../models/BaseModel");
+const Model = require(__dirname + "/../../models/BaseModel");
 
-var table = 'product';
+const table = 'product';
 model = new Model();
 model.table_name = table;
 
 /* 
  * Get product by id
  *
- * @param pid for product id
- * @param callback function
+ * @param pid       use for product id
+ * @param callback  use as function
  *
- * return string|object 
+ * return object 
  */
 model.getById = function(pid, callback) {
 
-    let sql = `
+    sql = `
         SELECT
           product_id, 
           name, 
@@ -26,14 +26,16 @@ model.getById = function(pid, callback) {
         FROM
            ` + table + `
         WHERE
-          product_id = ` + pid;
+          product_id = $pid `;
 
-    this.db.query(sql).then(results => {
-        if (results.length > 0) {
-            callback(false, results[0]);
-        } else {
-            callback(true, results);
-        }
+    this.db.query(sql, 
+      { 
+        bind: { 
+            pid: pid
+        },
+        type: this.db.QueryTypes.SELECT 
+    }).then(dbRes => {
+        callback(false, dbRes);
     }).catch(function(err) {
         callback(true, err);
     });
@@ -46,30 +48,30 @@ model.getById = function(pid, callback) {
  * @param limit     it indicates limit per page
  * @param desLen    it used for description length
  * @param qs        use for query string
- * @param callback function
+ * @param callback  use as function
  *
- * return string|object 
+ * return object 
  */
 model.getProducts = function(page, limit, desLen, qs, callback) {
 
     // Set search key condition
-    var where = '';
+    where = '';
     if (qs != '') {
-        where = " WHERE MATCH(name, description)AGAINST('" + qs + "' IN NATURAL LANGUAGE MODE)";
+        where = " WHERE MATCH(name, description) AGAINST ('" + qs + "' IN NATURAL LANGUAGE MODE)";
     }
 
-    var sql = "SELECT count(product_id) as total FROM " + table + where;
+    sql = "SELECT count(product_id) as total FROM " + table + where;
 
-    this.db.query(sql).then(results => {
+    this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(results => {
         if (results.length > 0) {
 
-            let output = {};
+            output = {};
 
             // Set total records
-            output.count = results[0][0].total;
+            output.count = results[0].total;
 
             // Set attribute and description length
-            let attribute = "product_id, name, ";
+            attribute = "product_id, name, ";
             if (desLen > 0) {
                 attribute += "CONCAT(LEFT(description, " + desLen + "), '...') AS description, ";
             } else {
@@ -78,7 +80,7 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
             attribute += "price, discounted_price, thumbnail";
 
             // Set pagination
-            let start = (page - 1) * limit;
+            start = (page - 1) * limit;
 
             // Get records
             sql = "SELECT " + attribute 
@@ -86,13 +88,9 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
                 + where 
                 + " LIMIT " + start + "," + limit;
                 
-            this.db.query(sql).then(dbRes => {
-                if (dbRes.length > 0) {
-                    output.rows = dbRes[0];
-                    callback(false, output);
-                } else {
-                    callback(true, 'No Record found');
-                }
+            this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {                
+                output.rows = dbRes;
+                callback(false, output);
             }).catch(err => {
                 callback(true, err);
             });
@@ -112,15 +110,15 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
  * @param desLen    it used for description length
  * @param cid       use for category id
  * @param did       use for department id
- * @param callback function
+ * @param callback  use as function
  *
- * return string|object 
+ * return object 
  */
 
 model.getByCatProId = function(page, limit, desLen, cid, did, callback) {
 
     // Set joins condition
-    var condition = " INNER JOIN product_category AS pc ON pc.product_id = p.product_id";
+    condition = " INNER JOIN product_category AS pc ON pc.product_id = p.product_id";
     condition += " INNER JOIN category AS c ON c.category_id = pc.category_id";
 
     // Condition by category/product id
@@ -131,20 +129,20 @@ model.getByCatProId = function(page, limit, desLen, cid, did, callback) {
     }
 
     // Count query
-    var sql = "SELECT count(p.product_id) as total FROM " 
+    sql = "SELECT count(p.product_id) as total FROM " 
             + table + " AS p " 
             + condition;
 
-    this.db.query(sql).then(results => {
+    this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(results => {
         if (results.length > 0) {
 
-            let output = {};
+            output = {};
 
             // Set total records
-            output.count = results[0][0].total;
+            output.count = results[0].total;
 
             // Set attribute and description length
-            let attribute = "p.product_id, p.name, ";
+            attribute = "p.product_id, p.name, ";
             if (desLen > 0) {
                 attribute += "CONCAT(LEFT(p.description, " + desLen + "), '...') AS description, ";
             } else {
@@ -153,10 +151,10 @@ model.getByCatProId = function(page, limit, desLen, cid, did, callback) {
             attribute += "p.price, p.discounted_price, p.thumbnail";
 
             // Set result order
-            let order = (cid) ? " ORDER BY p.name ASC" : " ORDER BY p.display DESC";
+            order = (cid) ? " ORDER BY p.name ASC" : " ORDER BY p.display DESC";
 
             // Set pagination
-            let start = (page - 1) * limit;
+            start = (page - 1) * limit;
 
             // Get records
             sql = "SELECT " + attribute 
@@ -165,13 +163,9 @@ model.getByCatProId = function(page, limit, desLen, cid, did, callback) {
                 + order 
                 + " LIMIT " + start + ", " + limit;
 
-            this.db.query(sql).then(dbRes => {
-                if (dbRes.length > 0) {
-                    output.rows = dbRes[0];
-                    callback(false, output);
-                } else {
-                    callback(true, 'No Record found');
-                }
+            this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+                output.rows = dbRes;
+                callback(false, output);
             }).catch(err => {
                 callback(true, err);
             });

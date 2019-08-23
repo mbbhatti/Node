@@ -1,4 +1,4 @@
-const config = require(__dirname + "/../../config/setting")();
+//const config = require(__dirname + "/../../config/setting")();
 const nodeMailer = require('nodemailer');
 
 /* 
@@ -11,17 +11,27 @@ const nodeMailer = require('nodemailer');
  *
  * return object
  */
-var sendEmail = function(res, customer, product, helper) {
-    let transporter = nodeMailer.createTransport(config.mail);
+sendEmail = function(res, customer, product, helper) {
 
-    let html = '';
+    mailerConfig = {
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        auth: {
+            user: process.env.MAIL_USERNAME,
+            pass: process.env.MAIL_PASSWORD
+        }
+    };
+
+    transporter = nodeMailer.createTransport(mailerConfig);
+
+    html = '';
     html += "Hello " + customer.data.name + ",";
     html += "<p>You have made your order successfully!</p>";
     html += "<p>Regards,</p>";
-    html += "<p>"+config.admin.name+"</p>";
+    html += "<p>"+process.env.ADMIN_NAME+"</p>";
 
-    var mailOptions = {
-        from: config.admin.email,
+    mailOptions = {
+        from: process.env.ADMIN_EMAIL,
         to: customer.data.email,
         subject: 'Order Confirmation',
         html: html

@@ -2,7 +2,7 @@ const customerModel = require(__dirname + "/../models/api/CustomerModel");
 const customerValidation = require(__dirname + "/../modules/CustomerValidation");
 const customer = require(__dirname + '/../modules/CustomerHandler');
 const helper = require(__dirname + '/../modules/CustomHelper');
-const auth = require(__dirname + '/../../config/auth');
+const verification = require(__dirname + '/../modules/TokenVerification');
 const v = require('node-input-validator');
 const jwt = require('jsonwebtoken');
 
@@ -13,7 +13,7 @@ module.exports = {
     login: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.body, {
+    	validator = new v( req.body, {
 	        email	:'required|email',
 	        password: 'required'
 	    });
@@ -25,48 +25,60 @@ module.exports = {
 	        } else {	
 
 	        	// Set auth data
-		    	var data = {
+		    	data = {
 		    		email	: req.body.email,
 		    		password: helper.enCryptPassword(
 		    					req.body.password, 
 		    					req.body.email
 		    				)
 		    	};
-				
-				// Set query condition       				
-				var where = 'email = "'+data.email+'" and password = "'+data.password+'"';
 
 				// DB read process 
 				customerModel.setDB(req.db);		    	
-	        	customerModel.getRow('*', where, function(err, response) {
+	        	customerModel.auth(data, function(err, response) {
 					if (!err) {
-						var tokenData = {
+						tokenData = {
 							customer_id: response.customer_id,
 							name: response.name,
 							email: response.email,
 							role: 'customer'
 						}
 						// Set bearer token
-						var token = jwt.sign(
+						token = jwt.sign(
 							{data: tokenData}, 
-							auth.token.secret, 
-							{ expiresIn: auth.token.time }
+							process.env.AUTH_SECRET_TOKEN, 
+							{ expiresIn: process.env.AUTH_TOKEN_TIME }
 						);
-
 						output = {
 							'customer': {'schema':response}, 
 							'accessToken':'Bearer '+token,
-							'expires_in' : Math.floor(auth.token.time/3600)+'h'
+							'expires_in' : process.env.AUTH_TOKEN_TIME
 						};
 						helper.display(res, output, 200);
 					} else {
-						output = {
-							'status': 404,
-							'code': 'USR_01',
-							'message': 'Email or Password is invalid',
-							'field': 'DB'
-						};						
-						helper.display(res, output, 404);
+						if(response == 'Invalid') {
+							output = {
+								'status': 400,
+								'code': 'USR_01',
+								'message': "Email or Password is invalid",
+								'field': 'password'
+							};
+						} else if(response == '') {
+							output = {
+								'status': 400,
+								'code': 'USR_05',
+								'message': "The email doesn't exist.",
+								'field': 'email'
+							};
+						} else {
+							output = {
+								'status': 400,
+								'code': 'USR_05',
+								'message': response,
+								'field': 'DB'
+							};
+						}
+						helper.display(res, output);
 					}
 				});
 	        }
@@ -75,7 +87,7 @@ module.exports = {
     register: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.body, {
+    	validator = new v( req.body, {
 	        name	:'required|string',
 	        email	:'required|email',
 	        password: 'required'
@@ -88,7 +100,7 @@ module.exports = {
 	        } else {	   
 
 	        	// Setting new customer data
-	        	var data = {
+	        	data = {
 					name	: req.body.name,
 		    		email	: req.body.email,
 		    		password: helper.enCryptPassword(
@@ -99,12 +111,12 @@ module.exports = {
 
 				// DB read and write process 
 		    	customerModel.setDB(req.db);	    	
-	        	customerModel.insertRow(data, 'customer_id', function(err, record) {					
+	        	customerModel.insertRow(data, 'customer_id', function(err, record) {	        						
 					if (!err) {
 						customerModel.getCustomer(record, function(err, response) {
 							if(!err) {								
 								if(response != "") {
-									var tokenData = {
+									tokenData = {
 										customer_id: response.customer_id,
 										name: response.name,
 										email: response.email,
@@ -112,16 +124,16 @@ module.exports = {
 									}
 									
 									// Set bearer token
-									var token = jwt.sign(
+									token = jwt.sign(
 										{data: tokenData}, 
-										auth.token.secret, 
-										{ expiresIn: auth.token.time }
+										process.env.AUTH_SECRET_TOKEN, 
+										{ expiresIn: process.env.AUTH_TOKEN_TIME }
 									);						
 									
 									output = {
 										'customer': {'schema':response}, 
 										'accessToken':'Bearer '+token,
-										'expires_in' : Math.floor(auth.token.time/3600)+'h'
+										'expires_in' : process.env.AUTH_TOKEN_TIME
 									};
 									helper.display(res, output, 200);
 								} else {
@@ -129,7 +141,7 @@ module.exports = {
 										'status': 404,
 										'code': 'USR_05',
 										'message': "Record doesn't exist",
-										'field': 'DB'
+										'field': 'email'
 									};
 									helper.display(res, output, 404);
 								}
@@ -139,18 +151,18 @@ module.exports = {
 									'code': 'USR_04',
 									'message': response,
 									'field': 'DB'
-								};						
+								};	
 								helper.display(res, output);
 							}	
 						});
-					} else {						
-
-						var msg = '';
+					} else {
 						if(record.original !== undefined) {
 							if(record.original.code == 'ER_DUP_ENTRY') {
 								msg = 'The email already exists.';
+								field = 'email';
 							} else {
 								msg = record.original.sqlMessage;		
+								field = 'DB';
 							}
 						}
 
@@ -158,8 +170,8 @@ module.exports = {
 							'status': 400,
 							'code': 'USR_04',
 							'message': msg,
-							'field': 'DB'
-						};						
+							'field': field
+						};
 						helper.display(res, output);
 					}
 				});
@@ -169,7 +181,7 @@ module.exports = {
     updateProfile: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.body, {
+    	validator = new v( req.body, {
 	        name	 :'required',
 	        email	 :'required|email',
 	        day_phone:'phoneNumber',
@@ -183,12 +195,12 @@ module.exports = {
 			    helper.display(res, validation.message(validator.errors));
 	        } else {
 	        	// Check token
-	        	tokenCustomerId = customer.tokenVerify(req, res, jwt, auth);
-	        	if (typeof tokenCustomerId != "number") {
-	        		helper.display(res, tokenCustomerId, 401);	        	
+	        	customerDetail = verification.verify(req, res, jwt);
+	        	if (typeof customerDetail.data == 'undefined') {
+	        		helper.display(res, customerDetail, 401);	        	
 	        	} else {
 	        		// Set new data
-		        	var data = {
+		        	data = {
 						name		: req.body.name,
 			    		email		: req.body.email,				    		
 			    		day_phone	: (req.body.day_phone !== undefined) 
@@ -210,7 +222,7 @@ module.exports = {
 			    	customer.update(
 			    		req, 
 			    		res, 
-			    		tokenCustomerId, 
+			    		customerDetail.data.customer_id, 
 			    		data, 
 			    		customerModel, 
 			    		helper
@@ -222,7 +234,7 @@ module.exports = {
     updateAddress: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.body, {
+    	validator = new v( req.body, {
 	        address_1 : 'required',
 	        city : 'required',
 	        region : 'required',
@@ -237,12 +249,12 @@ module.exports = {
 			    helper.display(res, validation.message(validator.errors));
 	        } else {		    	
 		    	// Check token
-	        	tokenCustomerId = customer.tokenVerify(req, res, jwt, auth);
-	        	if (typeof tokenCustomerId != "number") {
-	        		helper.display(res, tokenCustomerId, 401);	        	
+	        	customerDetail = verification.verify(req, res, jwt);
+	        	if (typeof customerDetail.data == 'undefined') {
+	        		helper.display(res, customerDetail, 401);	        	
 	        	} else {
 	        		// Set new data
-		        	var data = {
+		        	data = {
 						address_1			: req.body.address_1,
 						address_2			: (req.body.address_2 !== undefined) 
 			    								? req.body.address_2 : '',
@@ -257,7 +269,7 @@ module.exports = {
 			    	customer.update(
 			    		req, 
 			    		res, 
-			    		tokenCustomerId, 
+			    		customerDetail.data.customer_id,
 			    		data, 
 			    		customerModel, 
 			    		helper
@@ -269,7 +281,7 @@ module.exports = {
     updateCreditCard: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.body, {
+    	validator = new v( req.body, {
 	        credit_card : 'required|creditCard'
 	    });
 
@@ -279,12 +291,12 @@ module.exports = {
 			    helper.display(res, validation.message(validator.errors));
 	        } else {
 	        	// Check token
-	        	tokenCustomerId = customer.tokenVerify(req, res, jwt, auth);
-	        	if (typeof tokenCustomerId != "number") {
-	        		helper.display(res, tokenCustomerId, 401);	        	
+	        	customerDetail = verification.verify(req, res, jwt);	        	
+	        	if (typeof customerDetail.data == 'undefined') {
+	        		helper.display(res, customerDetail, 401);	        	
 	        	} else {
 	        		// Set new data
-		        	var data = { 
+		        	data = { 
 		        		credit_card: req.body.credit_card 
 		        	};
 
@@ -292,7 +304,7 @@ module.exports = {
 			    	customer.update(
 			    		req, 
 			    		res, 
-			    		tokenCustomerId, 
+			    		customerDetail.data.customer_id, 
 			    		data, 
 			    		customerModel, 
 			    		helper

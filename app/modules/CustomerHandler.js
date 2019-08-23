@@ -1,46 +1,4 @@
 /* 
- * Verify USER-KEY bearer token
- *
- * @param req
- * @param res 
- * @param jwt       used for json web token
- * @param callback  function
- *
- * return object 
- */
-var tokenVerify = function(req, res, jwt, auth) {
-    // Get USER-KEY token
-    token = req.headers['user-key'];
-
-    if (token == "" || token == undefined) {
-        output = {
-            'status': 204,
-            'code': 'AUT_01',
-            'message': 'Authorization code is empty',
-            'field': 'USER-KEY'
-        };
-    } else {
-        // Get and verify key
-        token = token.split(/\s+/).pop();
-        jwt.verify(token, auth.token.secret, function(err, decoded) {
-            if (err) {
-                output = {
-                    'status': 401,
-                    'code': 'AUT_02',
-                    'message': 'Access Unauthorized',
-                    'field': 'USER-KEY'
-                };
-            } else {
-                output = decoded.data.customer_id;
-            }
-        });
-    }
-    return output;
-}
-
-exports.tokenVerify = tokenVerify;
-
-/* 
  * Update customer record
  *
  * @param req
@@ -53,7 +11,7 @@ exports.tokenVerify = tokenVerify;
  *
  * return object
  */
-var update = function(req, res, cid, data, customerModel, cstHelper) {
+update = function(req, res, cid, data, customerModel, cstHelper) {
     // Set query condition
     where = " customer_id ='" + cid + "'";
 

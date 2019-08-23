@@ -1,10 +1,10 @@
 # About
-Node JS based API application.
+Node based API application.
 
 # Requirements 
 - Node  	v11.11.0
 - Express 	v4.17.1
-- MySql		v5+ 
+- MySql		v8+ 
 
 # Installation 
 Please check you have node installed on your system then download project through this github URL.
@@ -15,14 +15,15 @@ To get all required packages run this command.
 
 # Configuration
 Get database form here https://github.com/zandoan/turing-backend/tree/master/database
-- Make database setting in config setting file
-- Mailtrap used to send email and it's auth(user,pwd) can be updated in mail block of setting file as per your.
+Use this command to create .env file and make setting for email, database, auth token and etc. 
+- npm run copy 
+
 
 # Architecture
 - app/Controllers contains all required application controllers for individual module.
 - app/Models has base and individual associated table model for business logics.
 - app/Modules contains custome modules validation, handler and helper files.
-- Config contains database, E-mail, auth token and testing config files. 
+- .env file will contain the database, e-mail, auth token and testing configuration. 
 - doc file cantains application documents
 - Routes defines endpoints for all APIs with respect of controllers.
 - test has all test cases for the main functions of the system.

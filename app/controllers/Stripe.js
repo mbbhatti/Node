@@ -1,7 +1,6 @@
 const stripeValidation = require(__dirname + "/../modules/StripeValidation");
 const helper = require(__dirname + '/../modules/CustomHelper');
-const config = require(__dirname + "/../../config/stripe");
-const stripe = require("stripe")(config.stripe.secretkey);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const v = require('node-input-validator');
 
 const validation = new stripeValidation();	
@@ -11,7 +10,7 @@ module.exports = {
     charge: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.body, {
+    	validator = new v( req.body, {
 	        stripeToken :'required',
 	        order_id	:'required|integer',
 	        description :'required',

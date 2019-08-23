@@ -1,6 +1,6 @@
-var Model = require(__dirname + "/../../models/BaseModel");
+const Model = require(__dirname + "/../../models/BaseModel");
 
-var table = 'order_detail';
+const table = 'order_detail';
 model = new Model();
 model.table_name = table;
 
@@ -15,11 +15,11 @@ model.table_name = table;
  */
 model.insertOrderDetail = function(data, order, callback) {
 	
-	var fields = 'item_id, order_id, product_id, attributes, product_name, quantity, unit_cost';
-	var values = '';
+	fields = 'item_id, order_id, product_id, attributes, product_name, quantity, unit_cost';
+	values = '';
 
-	for (let i = 0; i < data.length; i++) {
-		let temp = '("'+
+	for (i = 0; i < data.length; i++) {
+		temp = '("'+
 					data[i].item_id+
 					'", "'+order.id+
 					'","'+data[i].product_id+
@@ -27,14 +27,15 @@ model.insertOrderDetail = function(data, order, callback) {
 					'","'+data[i].name+
 					'","'+data[i].quantity+
 					'","'+data[i].price+
-					'")';
+				'")';
 
 		values = values.concat(temp + ',');
 	}
+	
 	//-- Remove the last character which is comma
     values = values.substr(0, values.length - 1);
 
-    let sql = "INSERT INTO " + table + " (" + fields + ") VALUES " + values;
+    sql = "INSERT INTO " + table + " (" + fields + ") VALUES " + values;
 	
     this.db.query(sql).then(results => {
         if (results.length > 0) {

@@ -1,8 +1,49 @@
-var Model = require(__dirname + "/../../models/BaseModel");
+const Model = require(__dirname + "/../../models/BaseModel");
 
-var table = 'customer';
+const table = 'customer';
 model = new Model();
 model.table_name = table;
+
+/* 
+ * User Auth
+ *
+ * @param data      use for customer info
+ * @param callback  use as function
+ *
+ * return object 
+ */
+model.auth = function(req, callback) {
+
+    sql = ` 
+        SELECT 
+            * 
+        FROM 
+        ` + table + `
+        WHERE 
+            email = $email `;
+    
+    this.db.query(sql, 
+        { 
+            bind: { 
+                email: req.email
+            }, 
+            type: this.db.QueryTypes.SELECT 
+        }).then(dbRes => {
+        if (dbRes.length > 0) {
+            data = dbRes[0]; 
+            if(data.password != req.password) {
+                callback(true, 'Invalid');    
+            } else {
+                delete data.password;
+                callback(false, data);    
+            }            
+        } else {
+            callback(true, '');
+        }
+    }).catch(err => {
+        callback(true, err);
+    });
+}
 
 /* 
  * Get last inserted customer record
@@ -14,10 +55,23 @@ model.table_name = table;
  * return string|object 
  */
 model.getCustomer = function(data, callback) {
-    var sql = "SELECT * FROM " + table + " WHERE customer_id = " + data.id;
-    this.db.query(sql).then(dbRes => {
+    sql = ` 
+        SELECT 
+            * 
+        FROM 
+        ` + table + `
+        WHERE 
+            customer_id = $id `;
+    
+    this.db.query(sql, 
+        { 
+            bind: { 
+                id: data.id
+            },
+            type: this.db.QueryTypes.SELECT 
+        }).then(dbRes => {
         if (dbRes.length > 0) {
-            let data = dbRes[0][0]; 
+            data = dbRes[0]; 
             delete data.password;
             callback(false, data);
         } else {

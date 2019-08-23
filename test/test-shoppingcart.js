@@ -1,9 +1,9 @@
 var supertest = require("supertest");
 var should = require("should");
-var testConfig = require(__dirname + '/../config/test');
+const dotenv = require('dotenv').config();
 
 // PORT reference, where program is runninng.
-var server = supertest.agent(testConfig.test.server);
+var server = supertest.agent(process.env.APP_URL +':'+ process.env.APP_PORT);
 
 describe("Shopping Cart", function() {
 

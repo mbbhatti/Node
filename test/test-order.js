@@ -1,9 +1,9 @@
 var supertest = require("supertest");
 var should = require("should");
-var testConfig = require(__dirname + '/../config/test');
+const dotenv = require('dotenv').config();
 
 // PORT reference, where program is runninng.
-var server = supertest.agent(testConfig.test.server);
+var server = supertest.agent(process.env.APP_URL +':'+ process.env.APP_PORT);
 
 describe("Orders", function() {    
 
@@ -18,7 +18,7 @@ describe("Orders", function() {
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
+        .set('USER-KEY', process.env.AUTH_TEST_TOKEN)
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);
@@ -40,7 +40,7 @@ describe("Orders", function() {
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
+        .set('USER-KEY', process.env.AUTH_TEST_TOKEN)
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);
@@ -62,7 +62,7 @@ describe("Orders", function() {
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
+        .set('USER-KEY', process.env.AUTH_TEST_TOKEN)
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);
@@ -84,7 +84,7 @@ describe("Orders", function() {
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
-        .set('USER-KEY', 'Bearer ' + testConfig.test.token)
+        .set('USER-KEY', process.env.AUTH_TEST_TOKEN)
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);

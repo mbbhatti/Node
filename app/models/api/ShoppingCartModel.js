@@ -1,6 +1,6 @@
-var Model = require(__dirname + "/../../models/BaseModel");
+const Model = require(__dirname + "/../../models/BaseModel");
 
-var table = 'shopping_cart';
+const table = 'shopping_cart';
 model = new Model();
 model.table_name = table;
 
@@ -14,7 +14,7 @@ model.table_name = table;
  */
 model.getLastCart = function(data, callback) {
 
-    let sql = `
+    sql = `
         SELECT
           sc.item_id,
           p.name,
@@ -31,10 +31,16 @@ model.getLastCart = function(data, callback) {
         ON
           p.product_id = sc.product_id
         WHERE
-          sc.item_id = ` + data.id;
+          sc.item_id = $id `;
 
-    this.db.query(sql).then(dbRes => {
-        callback(false, dbRes[0]);
+    this.db.query(sql, 
+      { 
+        bind: { 
+            id: data.id
+        },
+        type: this.db.QueryTypes.SELECT 
+    }).then(dbRes => {
+        callback(false, dbRes);
     }).catch(err => {
         callback(true, err);
     });
@@ -50,7 +56,7 @@ model.getLastCart = function(data, callback) {
  */
 model.getCartById = function(cid, callback) {
 
-    let sql = `
+    sql = `
         SELECT
           sc.item_id,
           sc.attributes,
@@ -65,9 +71,15 @@ model.getCartById = function(cid, callback) {
         ON
           p.product_id = sc.product_id
         WHERE
-          sc.cart_id = '` + cid + `'`;
+          sc.cart_id = $cid `;
 
-    this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+    this.db.query(sql, 
+      { 
+        bind: { 
+            cid: cid
+        },
+        type: this.db.QueryTypes.SELECT 
+    }).then(dbRes => {
         callback(false, dbRes);
     }).catch(err => {
         callback(false, err);
@@ -84,12 +96,17 @@ model.getCartById = function(cid, callback) {
  */
 model.checkDuplicate = function(where, callback) {
 
-    var sql = "SELECT item_id as id, quantity FROM " 
-            + table 
-            + " WHERE " + where;
+    sql = `
+          SELECT 
+            item_id as id, 
+            quantity 
+          FROM 
+            ` + table  + `
+          WHERE 
+            ` + where;
     
-    this.db.query(sql).then(dbRes => {
-        callback(false, dbRes[0][0]);
+    this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+        callback(false, dbRes[0]);
     }).catch(err => {
         callback(false, err);
     });

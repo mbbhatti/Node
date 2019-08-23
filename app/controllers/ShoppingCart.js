@@ -2,7 +2,7 @@ const shoppingCartModel = require(__dirname + "/../models/api/ShoppingCartModel"
 const shoppingCartValidation = require(__dirname + "/../modules/ShoppingCartValidation");
 const helper = require(__dirname + '/../modules/CustomHelper');
 const v = require('node-input-validator');
-var randomToken = require('random-token');
+const randomToken = require('random-token');
 
 const validation = new shoppingCartValidation();	
 
@@ -11,7 +11,7 @@ module.exports = {
     add: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.body, {
+    	validator = new v( req.body, {
 	        cart_id 	:'required',
 	        product_id	:'required|integer',
 	        attributes  :'required'
@@ -24,14 +24,14 @@ module.exports = {
 	        } else {	   
 
 	        	// Setting new customer data
-	        	var data = {
+	        	data = {
 					cart_id		: req.body.cart_id,
 		    		product_id	: req.body.product_id,
 		    		attributes	: req.body.attributes
 		    	};
 
-		    	// Update record on this condition
-		    	var where = 'cart_id = "' + data.cart_id 
+		    	// Update record based on this condition
+		    	where = 'cart_id = "' + data.cart_id 
                 + '" and product_id = "' + data.product_id 
                 + '" and attributes = "' + data. attributes + '"';
 
@@ -66,7 +66,7 @@ module.exports = {
 										}	
 									});						
 								} else {
-									var msg = '';
+									msg = '';
 									if(record.original !== undefined) {
 										msg = record.original.sqlMessage;		
 									}
@@ -81,7 +81,7 @@ module.exports = {
 								}
 							});
 		    			} else {
-		    				var update = {quantity: check.quantity + 1};
+		    				update = {quantity: check.quantity + 1};
 		    				shoppingCartModel.updateRow(update, where, function(error, response) {
 						        if (!error) {
 						            shoppingCartModel.getLastCart(check, function(err, response) {
@@ -119,9 +119,9 @@ module.exports = {
 						    });
 		    			}
 		    		} else {
-		    			var msg = '';
-						if(record.original !== undefined) {
-							msg = record.original.sqlMessage;		
+		    			msg = '';
+						if(check.original !== undefined) {
+							msg = check.original.sqlMessage;		
 						}
 
 						output = {
@@ -139,7 +139,7 @@ module.exports = {
     empty: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.params, {
+    	validator = new v( req.params, {
 	        cart_id :'required'
 	    });
 
@@ -147,9 +147,8 @@ module.exports = {
 	    validator.check().then(function (matched) {
 	        if (!matched) {		    
 			    helper.display(res, validation.message(validator.errors));
-	        } else {	   
-	        	
-		    	var where  = "cart_id = '" + req.params.cart_id + "'";
+	        } else {
+		    	where  = "cart_id = '" + req.params.cart_id + "'";
 				// DB delete process 
 		    	shoppingCartModel.setDB(req.db);	    	
 	        	shoppingCartModel.deleteRow(where, function(err, response) {	        		
@@ -176,16 +175,13 @@ module.exports = {
     },
     generateUniqueId: function(req, res, next) 
     {     	
-    	output = {
-			'cart_id': randomToken(11)
-		};		
-
+    	output = {'cart_id': randomToken(11)};		
 		helper.display(res, output, 200);
     },
     removeProduct: function(req, res, next) 
     { 
     	// Set validation rule
-    	let validator = new v( req.params, {
+    	validator = new v( req.params, {
 	        item_id :'required|integer'
 	    });
 
@@ -193,9 +189,8 @@ module.exports = {
 	    validator.check().then(function (matched) {
 	        if (!matched) {		    
 			    helper.display(res, validation.message(validator.errors));
-	        } else {	   
-	        	
-		    	var where  = "item_id = " + req.params.item_id;
+	        } else {
+		    	where  = "item_id = " + req.params.item_id;
 				// DB delete process 
 		    	shoppingCartModel.setDB(req.db);	    	
 	        	shoppingCartModel.deleteRow(where, function(err, response) {

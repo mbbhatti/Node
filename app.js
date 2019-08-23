@@ -1,7 +1,7 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var Sequelize = require('sequelize');
-var config = require('./config/setting')();
+const express = require('express');
+const bodyParser = require('body-parser');
+const Sequelize = require('sequelize');
+const dotenv = require('dotenv').config();
 
 module.exports = {
 	name: "Backend",
@@ -11,32 +11,32 @@ module.exports = {
         app.use(bodyParser.urlencoded({extended: true}));
         app.use(bodyParser.json());
         
-        var port = Number(process.env.PORT || 5000);
+        port = Number(process.env.APP_PORT || 5000);
         app.listen(port, function() {
-            console.log('Listening on http://localhost:' + port);
+            console.log('Listening on ', process.env.APP_URL +':'+ process.env.APP_PORT);
         }); 
 
 		this.routes(app);
 	},
     routes: function(app) { 
-        var next = function(req, res) {
+        next = function(req, res) {
             console.log('next(req, res)');
         }
 
-        var sqldb = new Sequelize(config.mysql.db, config.mysql.user, config.mysql.password, {
+        sqldb = new Sequelize(process.env.DB_DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
             dialect: "mysql",
-            host: config.mysql.host,
-            port: config.mysql.port
+            host: process.env.DB_HOST,
+            port: process.env.DB_PORT,
+            logging: false // Use to hide sql at console
         });
 
-        var attachSQLDB = function(req, res, next)
+        attachSQLDB = function(req, res, next)
         {            
-            sqldb.authenticate().then(() => {
-                console.log('Connection established successfully.');
+            sqldb.authenticate().then(() => {                
                 req.db = sqldb;            
                 next();                  
             }).catch(err => {
-                msg = 'Unable to connect to the database';
+                msg = 'Unable to connect to the database, check .env file for database configuration';
                 console.log(msg);                
 
                 res.contentType('application/json');   
@@ -46,11 +46,11 @@ module.exports = {
             });
         };  
 
-        var customerRoute = require('./routes/customer')(app, attachSQLDB, next);
-        var productRoute = require('./routes/product')(app, attachSQLDB, next);
-        var shoppingCartRoute = require('./routes/shoppingCart')(app, attachSQLDB, next);
-        var stripeRoute = require('./routes/stripe')(app, attachSQLDB, next);
-        var orderRoute = require('./routes/order')(app, attachSQLDB, next);
+        customerRoute = require('./routes/customer')(app, attachSQLDB, next);
+        productRoute = require('./routes/product')(app, attachSQLDB, next);
+        shoppingCartRoute = require('./routes/shoppingCart')(app, attachSQLDB, next);
+        stripeRoute = require('./routes/stripe')(app, attachSQLDB, next);
+        orderRoute = require('./routes/order')(app, attachSQLDB, next);
 
     }
 };

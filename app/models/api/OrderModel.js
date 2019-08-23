@@ -1,6 +1,6 @@
-var Model = require(__dirname + "/../../models/BaseModel");
+const Model = require(__dirname + "/../../models/BaseModel");
 
-var table = 'orders';
+const table = 'orders';
 model = new Model();
 model.table_name = table;
 
