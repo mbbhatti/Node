@@ -11,7 +11,7 @@ model.table_name = table;
  * @param order
  * @param callback function
  *
- * return string|object 
+ * @return object 
  */
 model.insertOrderDetail = function(data, order, callback) {
 	

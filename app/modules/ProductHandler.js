@@ -6,7 +6,7 @@
  * @param productModel  product model object
  * @param cstHelper     use for response message
  *
- * return object
+ * @return object
  */
 find = function(req, res, productModel, cstHelper) 
 {

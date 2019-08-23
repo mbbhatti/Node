@@ -6,7 +6,7 @@
  * @param jwt       used for json web token
  * @param callback  function
  *
- * return object 
+ * @return object 
  */
 verify = function(req, res, jwt) {
     // Get USER-KEY token

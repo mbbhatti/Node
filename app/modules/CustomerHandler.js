@@ -9,7 +9,7 @@
  * @param cstHelper     use for response message
  * @param callback      function
  *
- * return object
+ * @return object
  */
 update = function(req, res, cid, data, customerModel, cstHelper) {
     // Set query condition

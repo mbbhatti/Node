@@ -8,7 +8,7 @@ const nodeMailer = require('nodemailer');
  * @param product   has product data
  * @param helper use for response message 
  *
- * return object
+ * @return object
  */
 sendEmail = function(res, customer, product, helper) {
 

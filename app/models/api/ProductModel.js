@@ -10,7 +10,7 @@ model.table_name = table;
  * @param pid       use for product id
  * @param callback  use as function
  *
- * return object 
+ * @return object 
  */
 model.getById = function(pid, callback) {
 
@@ -50,7 +50,7 @@ model.getById = function(pid, callback) {
  * @param qs        use for query string
  * @param callback  use as function
  *
- * return object 
+ * @return object 
  */
 model.getProducts = function(page, limit, desLen, qs, callback) {
 
@@ -112,7 +112,7 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
  * @param did       use for department id
  * @param callback  use as function
  *
- * return object 
+ * @return object 
  */
 
 model.getByCatProId = function(page, limit, desLen, cid, did, callback) {

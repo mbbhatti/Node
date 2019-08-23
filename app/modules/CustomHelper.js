@@ -6,7 +6,7 @@ const crypto = require('crypto');
  * @param pwd 
  * @param salt
  *
- * return string 
+ * @return string 
  */
 enCryptPassword = function(pwd, salt) {
     hash = crypto.createHash('sha256').update(pwd).update(salt).digest('base64');
@@ -22,7 +22,7 @@ exports.enCryptPassword = enCryptPassword;
  * @param message 
  * @param errCode
  *
- * return object 
+ * @return object 
  */
 display = function(res, message, errCode = 400) {
     res.contentType('application/json');

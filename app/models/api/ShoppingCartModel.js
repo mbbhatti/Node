@@ -10,7 +10,7 @@ model.table_name = table;
  * @param data for cart id
  * @param callback function
  *
- * return string|object 
+ * @return object 
  */
 model.getLastCart = function(data, callback) {
 
@@ -52,7 +52,7 @@ model.getLastCart = function(data, callback) {
  * @param cid for cart id
  * @param callback function
  *
- * return string|object 
+ * @return object 
  */
 model.getCartById = function(cid, callback) {
 
@@ -92,7 +92,7 @@ model.getCartById = function(cid, callback) {
  * @param where condition
  * @param callback function
  *
- * return object 
+ * @return object 
  */
 model.checkDuplicate = function(where, callback) {
 

@@ -10,7 +10,7 @@ model.table_name = table;
  * @param data      use for customer info
  * @param callback  use as function
  *
- * return object 
+ * @return string|object 
  */
 model.auth = function(req, callback) {
 
@@ -52,7 +52,7 @@ model.auth = function(req, callback) {
  * @param data for customer id
  * @param callback function
  *
- * return string|object 
+ * @return string|object 
  */
 model.getCustomer = function(data, callback) {
     sql = ` 
