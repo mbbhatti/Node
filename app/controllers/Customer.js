@@ -195,12 +195,12 @@ module.exports = {
 			    helper.display(res, validation.message(validator.errors));
 	        } else {
 	        	// Check token
-	        	customerDetail = verification.verify(req, res, jwt);
-	        	if (typeof customerDetail.data == 'undefined') {
-	        		helper.display(res, customerDetail, 401);	        	
+	        	customer_token = verification.verify(req, res, jwt);
+	        	if (typeof customer_token.data == 'undefined') {
+	        		helper.display(res, customer_token, 401);	        	
 	        	} else {
 	        		// Set new data
-		        	data = {
+		        	request_data = {
 						name		: req.body.name,
 			    		email		: req.body.email,				    		
 			    		day_phone	: (req.body.day_phone !== undefined) 
@@ -212,18 +212,23 @@ module.exports = {
 			    	};
 
 			    	if(req.body.password !== undefined) {
-			    		data.password = helper.enCryptPassword(
+			    		request_data.password = helper.enCryptPassword(
 			    							req.body.password, 
 			    							req.body.email
 			    						);
 			    	}
 
+			    	// Setting customer data by token
+		        	customer_data = {
+						customer_id	: customer_token.data.customer_id
+			    	};
+
 			    	// Update record
 			    	customer.update(
 			    		req, 
 			    		res, 
-			    		customerDetail.data.customer_id, 
-			    		data, 
+			    		customer_data, 
+			    		request_data, 
 			    		customerModel, 
 			    		helper
 			    	);
@@ -249,12 +254,12 @@ module.exports = {
 			    helper.display(res, validation.message(validator.errors));
 	        } else {		    	
 		    	// Check token
-	        	customerDetail = verification.verify(req, res, jwt);
-	        	if (typeof customerDetail.data == 'undefined') {
-	        		helper.display(res, customerDetail, 401);	        	
+	        	customer_token = verification.verify(req, res, jwt);
+	        	if (typeof customer_token.data == 'undefined') {
+	        		helper.display(res, customer_token, 401);	        	
 	        	} else {
 	        		// Set new data
-		        	data = {
+		        	request_data = {
 						address_1			: req.body.address_1,
 						address_2			: (req.body.address_2 !== undefined) 
 			    								? req.body.address_2 : '',
@@ -265,12 +270,17 @@ module.exports = {
 			    		shipping_region_id	: req.body.shipping_region_id
 			    	};
 
+			    	// Setting customer data by token
+		        	customer_data = {
+						customer_id	: customer_token.data.customer_id
+			    	};
+
 			    	// Update record
 			    	customer.update(
 			    		req, 
 			    		res, 
-			    		customerDetail.data.customer_id,
-			    		data, 
+			    		customer_data,
+			    		request_data, 
 			    		customerModel, 
 			    		helper
 			    	);
@@ -291,21 +301,26 @@ module.exports = {
 			    helper.display(res, validation.message(validator.errors));
 	        } else {
 	        	// Check token
-	        	customerDetail = verification.verify(req, res, jwt);	        	
-	        	if (typeof customerDetail.data == 'undefined') {
-	        		helper.display(res, customerDetail, 401);	        	
+	        	customer_token = verification.verify(req, res, jwt);	        	
+	        	if (typeof customer_token.data == 'undefined') {
+	        		helper.display(res, customer_token, 401);	        	
 	        	} else {
 	        		// Set new data
-		        	data = { 
+		        	request_data = { 
 		        		credit_card: req.body.credit_card 
 		        	};
+
+		        	// Setting customer data by token
+		        	customer_data = {
+						customer_id	: customer_token.data.customer_id
+			    	};
 
 			    	// Update record
 			    	customer.update(
 			    		req, 
 			    		res, 
-			    		customerDetail.data.customer_id, 
-			    		data, 
+			    		customer_data, 
+			    		request_data, 
 			    		customerModel, 
 			    		helper
 			    	);

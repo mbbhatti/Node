@@ -27,7 +27,7 @@ module.exports = {
             dialect: "mysql",
             host: process.env.DB_HOST,
             port: process.env.DB_PORT,
-            logging: false // Use to hide sql at console
+            logging: false // Hide query at console
         });
 
         attachSQLDB = function(req, res, next)

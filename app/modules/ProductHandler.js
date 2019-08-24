@@ -9,8 +9,7 @@
  *
  * @return object
  */
-find = function(req, res, productModel, cstHelper) 
-{
+find = function(req, res, productModel, cstHelper) {
     qs = (req.query.query_string == undefined || req.query.query_string == '') 
                 ? '' : req.query.query_string;
     page = (req.query.page == undefined || req.query.page == '') 

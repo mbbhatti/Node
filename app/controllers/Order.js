@@ -67,11 +67,12 @@ module.exports = {
 									orderDetailModel.setDB(req.db);
 									orderDetailModel.insertOrderDetail(cartData, ordRes, function(err, detRes) {
 										if (!err) {
-											where  = "cart_id = '" + req.body.cart_id + "'";
-											
+											// Set request data
+	        								data = {cart_id: req.body.cart_id};
+
 											// DB delete shopping cart entry 
 									    	shoppingCartModel.setDB(req.db);	    	
-								        	shoppingCartModel.deleteRow(where, function(err, response) {								        			        		
+								        	shoppingCartModel.deleteRow(data, function(err, response) {								        			        		
 												if (!err) {				
 													// send Order confirmation email											
 													order.sendEmail(res, customer, ordRes, helper);														

@@ -13,7 +13,6 @@ model.table_name = table;
  * @return object 
  */
 model.getById = function(pid, callback) {
-
     sql = `
         SELECT
           product_id, 
@@ -29,12 +28,11 @@ model.getById = function(pid, callback) {
           product_id = $pid `;
 
     this.db.query(sql, 
-      { 
-        bind: { 
-            pid: pid
-        },
-        type: this.db.QueryTypes.SELECT 
-    }).then(dbRes => {
+        { 
+            bind: { pid: pid },
+            type: this.db.QueryTypes.SELECT 
+        }
+    ).then(dbRes => {
         callback(false, dbRes);
     }).catch(function(err) {
         callback(true, err);
@@ -53,7 +51,6 @@ model.getById = function(pid, callback) {
  * @return object 
  */
 model.getProducts = function(page, limit, desLen, qs, callback) {
-
     // Set search key condition
     where = '';
     if (qs != '') {
@@ -62,7 +59,9 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
 
     sql = "SELECT count(product_id) as total FROM " + table + where;
 
-    this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(results => {
+    this.db.query(sql, 
+        { type: this.db.QueryTypes.SELECT }
+    ).then(results => {
         if (results.length > 0) {
 
             output = {};
@@ -88,7 +87,9 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
                 + where 
                 + " LIMIT " + start + "," + limit;
                 
-            this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {                
+            this.db.query(sql, 
+                { type: this.db.QueryTypes.SELECT }
+            ).then(dbRes => {                
                 output.rows = dbRes;
                 callback(false, output);
             }).catch(err => {
@@ -116,7 +117,6 @@ model.getProducts = function(page, limit, desLen, qs, callback) {
  */
 
 model.getByCatProId = function(page, limit, desLen, cid, did, callback) {
-
     // Set joins condition
     condition = " INNER JOIN product_category AS pc ON pc.product_id = p.product_id";
     condition += " INNER JOIN category AS c ON c.category_id = pc.category_id";
@@ -133,7 +133,9 @@ model.getByCatProId = function(page, limit, desLen, cid, did, callback) {
             + table + " AS p " 
             + condition;
 
-    this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(results => {
+    this.db.query(sql, 
+        { type: this.db.QueryTypes.SELECT }
+    ).then(results => {
         if (results.length > 0) {
 
             output = {};
@@ -163,7 +165,9 @@ model.getByCatProId = function(page, limit, desLen, cid, did, callback) {
                 + order 
                 + " LIMIT " + start + ", " + limit;
 
-            this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+            this.db.query(sql, 
+                { type: this.db.QueryTypes.SELECT }
+            ).then(dbRes => {
                 output.rows = dbRes;
                 callback(false, output);
             }).catch(err => {

@@ -13,7 +13,6 @@ model.table_name = table;
  * @return string|object 
  */
 model.auth = function(req, callback) {
-
     sql = ` 
         SELECT 
             * 
@@ -24,11 +23,10 @@ model.auth = function(req, callback) {
     
     this.db.query(sql, 
         { 
-            bind: { 
-                email: req.email
-            }, 
+            bind: { email: req.email }, 
             type: this.db.QueryTypes.SELECT 
-        }).then(dbRes => {
+        }
+    ).then(dbRes => {
         if (dbRes.length > 0) {
             data = dbRes[0]; 
             if(data.password != req.password) {
@@ -54,7 +52,7 @@ model.auth = function(req, callback) {
  *
  * @return string|object 
  */
-model.getCustomer = function(data, callback) {
+model.getCustomer = function(data, callback) {    
     sql = ` 
         SELECT 
             * 
@@ -65,11 +63,10 @@ model.getCustomer = function(data, callback) {
     
     this.db.query(sql, 
         { 
-            bind: { 
-                id: data.id
-            },
+            bind: { id: data.id },
             type: this.db.QueryTypes.SELECT 
-        }).then(dbRes => {
+        }
+    ).then(dbRes => {
         if (dbRes.length > 0) {
             data = dbRes[0]; 
             delete data.password;

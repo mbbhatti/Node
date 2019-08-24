@@ -32,11 +32,10 @@ model.insertOrderDetail = function(data, order, callback) {
 		values = values.concat(temp + ',');
 	}
 	
-	//-- Remove the last character which is comma
+	//-- Remove the last character
     values = values.substr(0, values.length - 1);
 
-    sql = "INSERT INTO " + table + " (" + fields + ") VALUES " + values;
-	
+    sql = "INSERT INTO " + table + " (" + fields + ") VALUES " + values;	
     this.db.query(sql).then(results => {
         if (results.length > 0) {
             callback(false, results[0]);

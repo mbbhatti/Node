@@ -24,20 +24,16 @@ module.exports = {
 	        } else {	   
 
 	        	// Setting new customer data
+	        	// Update record based on these conditional values
 	        	data = {
 					cart_id		: req.body.cart_id,
 		    		product_id	: req.body.product_id,
 		    		attributes	: req.body.attributes
 		    	};
 
-		    	// Update record based on this condition
-		    	where = 'cart_id = "' + data.cart_id 
-                + '" and product_id = "' + data.product_id 
-                + '" and attributes = "' + data. attributes + '"';
-
 				// DB read and write process 
 		    	shoppingCartModel.setDB(req.db);	
-		    	shoppingCartModel.checkDuplicate(where, function(err, check) {		    		
+		    	shoppingCartModel.checkDuplicate(data, function(err, check) {		    		
 		    		if (!err) {
 		    			if(check.quantity == undefined) {
 		    				shoppingCartModel.insertRow(data, 'item_id', function(err, record) {
@@ -82,7 +78,7 @@ module.exports = {
 							});
 		    			} else {
 		    				update = {quantity: check.quantity + 1};
-		    				shoppingCartModel.updateRow(update, where, function(error, response) {
+		    				shoppingCartModel.updateRow(update, data, function(error, response) {
 						        if (!error) {
 						            shoppingCartModel.getLastCart(check, function(err, response) {
 										if(!err) {
@@ -148,10 +144,12 @@ module.exports = {
 	        if (!matched) {		    
 			    helper.display(res, validation.message(validator.errors));
 	        } else {
-		    	where  = "cart_id = '" + req.params.cart_id + "'";
+	        	// Set request data
+	        	data = {cart_id: req.params.cart_id};
+				
 				// DB delete process 
 		    	shoppingCartModel.setDB(req.db);	    	
-	        	shoppingCartModel.deleteRow(where, function(err, response) {	        		
+	        	shoppingCartModel.deleteRow(data, function(err, response) {	        		
 					if (!err) {				
 						output = {
 							'status': 200,
@@ -190,10 +188,12 @@ module.exports = {
 	        if (!matched) {		    
 			    helper.display(res, validation.message(validator.errors));
 	        } else {
-		    	where  = "item_id = " + req.params.item_id;
+	        	// Set request data
+	        	data = {item_id: req.params.item_id};
+
 				// DB delete process 
 		    	shoppingCartModel.setDB(req.db);	    	
-	        	shoppingCartModel.deleteRow(where, function(err, response) {
+	        	shoppingCartModel.deleteRow(data, function(err, response) {
 					if (!err) {				
 						output = {
 							'status': 200,

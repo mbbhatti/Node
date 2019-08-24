@@ -21,7 +21,6 @@ module.exports.prototype = {
         this.db = db;
     },
     prepareInsertQuery: function(dataArray, table_name) {
-
         fields = '';
         values = '';
         sql = '';
@@ -43,7 +42,6 @@ module.exports.prototype = {
         return sql;
     },
     prepareAttributes: function(attr) {
-
         selection = '';
         for (i = 0; i < attr.length; i++) {
             //-- Dont add space after comma for formatting it is part of logic
@@ -62,7 +60,9 @@ module.exports.prototype = {
 
         this.db.query(sql).then(() => {
             sql = "SELECT MAX(" + attr + ") as id FROM " + self.table_name;
-            self.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+            self.db.query(sql, 
+                { type: this.db.QueryTypes.SELECT }
+            ).then(dbRes => {
                 if (dbRes.length > 0) {
                     callback(false, dbRes[0]);
                 } else {
@@ -75,11 +75,13 @@ module.exports.prototype = {
             callback(true, err);
         });
     },
-    getRow: function(attr, where, callback) {
+    getRow: function(attr, where, callback) {        
         type = typeof attr;
+        
         if (type == "object") {
             attr = this.prepareAttributes(attr);
         }
+        
         if (where != '' || where != 'undefined' || where != null) {
             where = " WHERE " + where
         } else {
@@ -87,7 +89,9 @@ module.exports.prototype = {
         }
 
         sql = "SELECT " + attr + " FROM " + this.table_name + " " + where;
-        this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+        this.db.query(sql, 
+            { type: this.db.QueryTypes.SELECT }
+        ).then(dbRes => {
             data = dbRes[0];
             delete data.password;
             callback(false, data);
@@ -96,18 +100,23 @@ module.exports.prototype = {
         });
 
     },
-    updateRow: function(data, where, callback) {
-
+    updateRow: function(data, fields, callback) {
+        field_type = typeof fields;        
+        data_type = typeof data;
         update_attr = '';
-        type = typeof data;
+        bind = {};
+        where = '';
 
-        if (where != '' || where != 'undefined' || where != null) {
-            where = " WHERE " + where
-        } else {
-            callback(true);
+        if(field_type == "object") {
+            for (field in fields) {                
+                where = where.concat(field + " = $" + field + " AND ");                 
+                bind[field] = fields[field];
+            }
+            //-- Remove the last word
+            where = " WHERE " + where.substr(0, where.length - 4);            
         }
 
-        if (type == "object") {
+        if (data_type == "object") {
             for (item in data) {
                 //-- Dont add space after comma
                 update_attr = update_attr.concat(item + "='" + data[item] + "',"); 
@@ -117,15 +126,22 @@ module.exports.prototype = {
             update_attr = update_attr.substr(0, update_attr.length - 1); 
         } else {
             update_attr = data;
-        }
+        }        
 
         sql = "UPDATE " + this.table_name + " SET " + update_attr + " " + where;
-        this.db.query(sql).then(() => {
+        this.db.query(sql, { bind: bind }).then(dbRes => {
             sql = "SELECT * FROM " + this.table_name + where;
-            this.db.query(sql, { type: this.db.QueryTypes.SELECT }).then(dbRes => {
+            this.db.query(sql, 
+                { 
+                    bind: bind, 
+                    type: this.db.QueryTypes.SELECT 
+                }
+            ).then(dbRes => {
                 if (dbRes.length > 0) {
                     data = dbRes[0];
-                    delete data.password;
+                    if(data.password != undefined) {
+                        delete data.password;
+                    }
                     callback(false, data);
                 } else {
                     callback(false, '');
@@ -137,20 +153,26 @@ module.exports.prototype = {
             callback(true, err);
         });
     },
-    deleteRow: function(where, callback) {
+    deleteRow: function(fields, callback) {
+        type = typeof fields;        
+        bind = {};
+        where = '';
 
-        if (where != '' || where != 'undefined' || where != null) {
-            where = " WHERE " + where
-        } else {
-            callback(true);
+        if(type == "object") {
+            for (field in fields) {                
+                where = where.concat(field + " = $" + field + " AND ");                 
+                bind[field] = fields[field];
+            }
+            //-- Remove the last word
+            where = " WHERE " + where.substr(0, where.length - 4);            
         }
         
         sql = "DELETE  FROM " + this.table_name + " " + where;
-        this.db.query(sql).then(dbRes => {
+        this.db.query(sql, { bind: bind }).then(dbRes => {
             if (dbRes[0].affectedRows > 0) {
                 callback(false, '');
             } else {
-                callback(true, "ID doesn't exist");
+                callback(true, '');
             }
         }).catch(err => {
             callback(true, err);

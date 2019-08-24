@@ -11,7 +11,6 @@ const nodeMailer = require('nodemailer');
  * @return object
  */
 sendEmail = function(res, customer, product, helper) {
-
     mailerConfig = {
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,
