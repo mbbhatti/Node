@@ -13,7 +13,10 @@ model.table_name = table;
  */
 model.getLastCart = async function(id) {
     // Get where and bind values
-    whereBind = await model.prepareBindWhere({item_id:id});    
+    whereBind = await model.prepareBindWhere({
+        item_id: id
+    });
+
     sql = `
         SELECT
           sc.item_id,
@@ -45,7 +48,10 @@ model.getLastCart = async function(id) {
  */
 model.getCartById = async function(id) {
     // Get where and bind values
-    whereBind = await model.prepareBindWhere({cart_id:id});
+    whereBind = await model.prepareBindWhere({
+        cart_id: id
+    });
+
     sql = `
         SELECT
           sc.item_id,
@@ -63,7 +69,7 @@ model.getCartById = async function(id) {
         whereBind.where;
 
     // Return response
-    return await model.execute(sql, whereBind.bind);    
+    return await model.execute(sql, whereBind.bind);
 }
 
 /**
@@ -76,13 +82,14 @@ model.getCartById = async function(id) {
 model.checkDuplicate = async function(data) {
     // Get where and bind values
     whereBind = await model.prepareBindWhere(data);
+
     sql = `
           SELECT 
             item_id as id, 
             quantity 
-          FROM ` + 
-          table + 
-          whereBind.where;
+          FROM ` +
+        table +
+        whereBind.where;
 
     // Get data
     result = await model.execute(sql, whereBind.bind);

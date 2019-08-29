@@ -1,19 +1,17 @@
 /**
-* Customer validation 
-*/
-class CustomerValidation 
-{
-    message(data) 
-    {
+ * Customer validation 
+ */
+class CustomerValidation {
+    message(data) {
         if (data.email !== undefined) {
-            if (data.email.rule === "required") {
+            if (data.email.rule === 'required') {
                 return {
                     'status': 400,
                     'code': 'USR_02',
                     'message': 'The email is required.',
                     'field': 'email'
                 }
-            } else if (data.email.rule === "email") {
+            } else if (data.email.rule === 'email') {
                 return {
                     'status': 400,
                     'code': 'USR_03',
@@ -21,56 +19,56 @@ class CustomerValidation
                     'field': data.email.rule
                 }
             }
-        } else if (data.password !== undefined && 
-            data.password.rule === "required") {
+        } else if (data.password !== undefined &&
+            data.password.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'USR_02',
                 'message': 'The password is required.',
                 'field': 'password'
             }
-        } else if (data.name !== undefined && 
-            data.name.rule === "required") {
+        } else if (data.name !== undefined &&
+            data.name.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'USR_02',
                 'message': 'The name is required.',
                 'field': 'name'
             }
-        } else if (data.address_1 !== undefined && 
-            data.address_1.rule === "required") {
+        } else if (data.address_1 !== undefined &&
+            data.address_1.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'USR_02',
                 'message': 'The address 1 is required.',
                 'field': 'address_1'
             }
-        } else if (data.city !== undefined && 
-            data.city.rule === "required") {
+        } else if (data.city !== undefined &&
+            data.city.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'USR_02',
                 'message': 'The city is required.',
                 'field': 'city'
             }
-        } else if (data.region !== undefined && 
-            data.region.rule === "required") {
+        } else if (data.region !== undefined &&
+            data.region.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'USR_02',
                 'message': 'The region is required.',
                 'field': 'region'
             }
-        } else if (data.postal_code !== undefined && 
-            data.postal_code.rule === "required") {
+        } else if (data.postal_code !== undefined &&
+            data.postal_code.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'USR_02',
                 'message': 'The postal code is required.',
                 'field': 'postal_code'
             }
-        } else if (data.country !== undefined && 
-            data.country.rule === "required") {
+        } else if (data.country !== undefined &&
+            data.country.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'USR_02',
@@ -78,14 +76,14 @@ class CustomerValidation
                 'field': 'country'
             }
         } else if (data.shipping_region_id !== undefined) {
-            if (data.shipping_region_id.rule === "required") {
+            if (data.shipping_region_id.rule === 'required') {
                 return {
                     'status': 400,
                     'code': 'USR_02',
                     'message': 'The shipping region ID is required.',
                     'field': 'shipping_region_id'
                 }
-            } else if (data.shipping_region_id.rule === "integer") {
+            } else if (data.shipping_region_id.rule === 'integer') {
                 return {
                     'status': 400,
                     'code': 'USR_09',
@@ -94,14 +92,14 @@ class CustomerValidation
                 }
             }
         } else if (data.credit_card !== undefined) {
-            if (data.credit_card.rule === "required") {
+            if (data.credit_card.rule === 'required') {
                 return {
                     'status': 400,
                     'code': 'USR_02',
                     'message': 'The credit card is required.',
                     'field': 'credit_card'
                 }
-            } else if (data.credit_card.rule === "creditCard") {
+            } else if (data.credit_card.rule === 'creditCard') {
                 return {
                     'status': 400,
                     'code': 'USR_08',
@@ -110,7 +108,7 @@ class CustomerValidation
                 }
             }
         } else if (data.day_phone !== undefined) {
-            if (data.day_phone.rule === "phoneNumber") {
+            if (data.day_phone.rule === 'phoneNumber') {
                 return {
                     'status': 400,
                     'code': 'USR_06',
@@ -119,7 +117,7 @@ class CustomerValidation
                 }
             }
         } else if (data.eve_phone !== undefined) {
-            if (data.eve_phone.rule === "phoneNumber") {
+            if (data.eve_phone.rule === 'phoneNumber') {
                 return {
                     'status': 400,
                     'code': 'USR_06',
@@ -128,7 +126,7 @@ class CustomerValidation
                 }
             }
         } else if (data.mob_phone !== undefined) {
-            if (data.mob_phone.rule === "creditCard") {
+            if (data.mob_phone.rule === 'creditCard') {
                 return {
                     'status': 400,
                     'code': 'USR_06',

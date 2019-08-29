@@ -11,9 +11,10 @@ model.table_name = table;
  *
  * @return string|object  
  */
-model.getById = async function(data) {    
+model.getById = async function(data) {
     // Get where and bind values
-    whereBind = await model.prepareBindWhere(data);    
+    whereBind = await model.prepareBindWhere(data);
+
     sql = `
         SELECT
           product_id, 
@@ -23,8 +24,8 @@ model.getById = async function(data) {
           discounted_price, 
           image, 
           image_2
-        FROM ` + 
-        table + 
+        FROM ` +
+        table +
         whereBind.where;
 
     // Get data
@@ -44,13 +45,15 @@ model.getById = async function(data) {
 model.getProducts = async function(page, limit, desLen, qs) {
     // Set search key condition
     where = '';
+
     if (qs != '') {
         where = " WHERE MATCH(name, description) AGAINST ('" + qs + "' IN NATURAL LANGUAGE MODE)";
     }
 
     // Get record count
     sql = "SELECT count(product_id) as total FROM " + table + where;
-    const result =  await model.execute(sql);
+
+    const result = await model.execute(sql);
 
     // Get record detail
     if (result.length > 0) {
@@ -72,16 +75,17 @@ model.getProducts = async function(page, limit, desLen, qs) {
         start = (page - 1) * limit;
 
         // Get records
-        sql = "SELECT " + attribute 
-            + " FROM " + table 
-            + where 
-            + " LIMIT " + start + "," + limit;
-        
-        output.rows =  await model.execute(sql);
+        sql = "SELECT " + attribute +
+            " FROM " + table +
+            where +
+            " LIMIT " + start + "," + limit;
+
+        output.rows = await model.execute(sql);
+
         return output;
     } else {
         return result;
-    }    
+    }
 };
 
 /**
@@ -109,12 +113,12 @@ model.getByCatProId = async function(page, limit, desLen, cid, did) {
     }
 
     // Get record count
-    sql = "SELECT count(p.product_id) as total FROM " 
-            + table + " AS p " 
-            + condition;
+    sql = "SELECT count(p.product_id) as total FROM " +
+        table + " AS p " +
+        condition;
 
-    const result =  await model.execute(sql); 
-    
+    const result = await model.execute(sql);
+
     // Get record detail   
     if (result.length > 0) {
 
@@ -139,13 +143,14 @@ model.getByCatProId = async function(page, limit, desLen, cid, did) {
         start = (page - 1) * limit;
 
         // Get records
-        sql = "SELECT " + attribute 
-            + " FROM " + table + " AS p " 
-            + condition 
-            + order 
-            + " LIMIT " + start + ", " + limit;
+        sql = "SELECT " + attribute +
+            " FROM " + table + " AS p " +
+            condition +
+            order +
+            " LIMIT " + start + ", " + limit;
 
-        output.rows =  await model.execute(sql);
+        output.rows = await model.execute(sql);
+
         return output;
     } else {
         return result;

@@ -1,12 +1,10 @@
 /**
-* Product validation
-*/
-class ProductValidation 
-{
-    message(data) 
-    {
-        if (data.query_string !== undefined && 
-            data.query_string.rule === "required") {
+ * Product validation
+ */
+class ProductValidation {
+    message(data) {
+        if (data.query_string !== undefined &&
+            data.query_string.rule === 'required') {
             return {
                 'status': 400,
                 'code': 'PRO_01',
@@ -14,14 +12,14 @@ class ProductValidation
                 'field': 'query_string'
             }
         } else if (data.category_id !== undefined) {
-            if (data.category_id.rule === "required") {
+            if (data.category_id.rule === 'required') {
                 return {
                     'status': 400,
                     'code': 'CAT_02',
                     'message': 'The category ID is required.',
                     'field': 'category_id'
                 }
-            } else if (data.category_id.rule === "integer") {
+            } else if (data.category_id.rule === 'integer') {
                 return {
                     'status': 400,
                     'code': 'CAT_03',
@@ -30,14 +28,14 @@ class ProductValidation
                 }
             }
         } else if (data.department_id !== undefined) {
-            if (data.department_id.rule === "required") {
+            if (data.department_id.rule === 'required') {
                 return {
                     'status': 400,
                     'code': 'DEP_01',
                     'message': 'The department ID is required.',
                     'field': 'department_id'
                 }
-            } else if (data.department_id.rule === "integer") {
+            } else if (data.department_id.rule === 'integer') {
                 return {
                     'status': 400,
                     'code': 'DEP_03',
@@ -46,14 +44,14 @@ class ProductValidation
                 }
             }
         } else if (data.product_id !== undefined) {
-            if (data.product_id.rule === "required") {
+            if (data.product_id.rule === 'required') {
                 return {
                     'status': 400,
                     'code': 'PRO_01',
                     'message': 'The product ID is required.',
                     'field': 'product_id'
                 }
-            } else if (data.product_id.rule === "integer") {
+            } else if (data.product_id.rule === 'integer') {
                 return {
                     'status': 400,
                     'code': 'PRO_02',
@@ -62,7 +60,7 @@ class ProductValidation
                 }
             }
         } else if (data.page !== undefined) {
-            if (data.page.rule === "integer") {
+            if (data.page.rule === 'integer') {
                 return {
                     'status': 400,
                     'code': 'PRO_02',
@@ -71,7 +69,7 @@ class ProductValidation
                 }
             }
         } else if (data.limit !== undefined) {
-            if (data.limit.rule === "integer") {
+            if (data.limit.rule === 'integer') {
                 return {
                     'status': 400,
                     'code': 'PRO_02',
@@ -80,7 +78,7 @@ class ProductValidation
                 }
             }
         } else if (data.description_length !== undefined) {
-            if (data.description_length.rule === "integer") {
+            if (data.description_length.rule === 'integer') {
                 return {
                     'status': 400,
                     'code': 'PRO_02',

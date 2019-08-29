@@ -7,87 +7,82 @@ const v = require('node-input-validator');
 const validation = new productValidation();
 
 module.exports = {
-    name: "Product",
-    all: function(req, res, next) 
-    {
-        validator = new v( req.query, {
-            page :'integer',
-            limit :'integer',
-            description_length :'integer'
+    name: 'Product',
+    all: function(req, res, next) {
+        validator = new v(req.query, {
+            page: 'integer',
+            limit: 'integer',
+            description_length: 'integer'
         });
 
-        validator.check().then(function (matched) {
-            if (!matched) {              
-                helper.display(res, validation.message(validator.errors));
-            } else {                
-                product.find(req, res, productModel, helper);    
-            }
-        });
-        
-    },
-    search: function(req, res, next) 
-    {        
-        validator = new v( req.query, {
-            query_string :'required',
-            page :'integer',
-            limit :'integer',
-            description_length :'integer'
-        });
-
-        validator.check().then(function (matched) {
-            if (!matched) {              
-                helper.display(res, validation.message(validator.errors));
-            } else {                
-                product.find(req, res, productModel, helper);
-            }
-        });  
-    },
-    detail: function(req, res, next) 
-    {
-        validator = new v( req.params, {
-            product_id :'required|integer'
-        });
-
-        validator.check().then(function (matched) {
-            if (!matched) {                                
+        validator.check().then(function(matched) {
+            if (!matched) {
                 helper.display(res, validation.message(validator.errors));
             } else {
                 product.find(req, res, productModel, helper);
             }
-        });  
-    },
-    category: function(req, res, next) 
-    {         
-        validator = new v( req.params, {
-            category_id :'required|integer',
-            page :'integer',
-            limit :'integer',
-            description_length :'integer'
         });
 
-        validator.check().then(function (matched) {
-            if (!matched) {                                
-                helper.display(res, validation.message(validator.errors));
-            } else {          
-                product.find(req, res, productModel, helper);
-            }
-        });  
     },
-    department: function(req, res, next) 
-    {         
-        validator = new v( req.params, {
-            department_id :'required|integer',
-            page :'integer',
-            limit :'integer',
-            description_length :'integer'
+    search: function(req, res, next) {
+        validator = new v(req.query, {
+            query_string: 'required',
+            page: 'integer',
+            limit: 'integer',
+            description_length: 'integer'
         });
 
-        validator.check().then(function (matched) {
-            if (!matched) {                                
+        validator.check().then(function(matched) {
+            if (!matched) {
                 helper.display(res, validation.message(validator.errors));
-            } else {         
+            } else {
                 product.find(req, res, productModel, helper);
             }
-        });  
+        });
+    },
+    detail: function(req, res, next) {
+        validator = new v(req.params, {
+            product_id: 'required|integer'
+        });
+
+        validator.check().then(function(matched) {
+            if (!matched) {
+                helper.display(res, validation.message(validator.errors));
+            } else {
+                product.find(req, res, productModel, helper);
+            }
+        });
+    },
+    category: function(req, res, next) {
+        validator = new v(req.params, {
+            category_id: 'required|integer',
+            page: 'integer',
+            limit: 'integer',
+            description_length: 'integer'
+        });
+
+        validator.check().then(function(matched) {
+            if (!matched) {
+                helper.display(res, validation.message(validator.errors));
+            } else {
+                product.find(req, res, productModel, helper);
+            }
+        });
+    },
+    department: function(req, res, next) {
+        validator = new v(req.params, {
+            department_id: 'required|integer',
+            page: 'integer',
+            limit: 'integer',
+            description_length: 'integer'
+        });
+
+        validator.check().then(function(matched) {
+            if (!matched) {
+                helper.display(res, validation.message(validator.errors));
+            } else {
+                product.find(req, res, productModel, helper);
+            }
+        });
     }
 }

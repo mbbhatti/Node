@@ -10,12 +10,12 @@
  *
  * @return object
  */
-update = function(req, res, customerData, requestData, customerModel, cstHelper) {    
+update = function(req, res, customerData, requestData, customerModel, cstHelper) {
     customerModel.updateRow(requestData, customerData).then((response) => {
         if (response == 'NotFound') {
             cstHelper.display(res, {
                 'code': 'USR_05',
-                'message': "Record doesn't exist"
+                'message': 'Record does not exist'
             });
         } else {
             // Return data

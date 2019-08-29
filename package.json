@@ -3,7 +3,7 @@
     "version": "2.0.0",
     "scripts": {
         "test": "mocha",
-        "copy": "cp .env.example .env", 
+        "copy": "cp .env.example .env",
         "start": "concurrently \"node app.js\""
     },
     "dependencies": {

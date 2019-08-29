@@ -13,19 +13,21 @@ model.table_name = table;
  */
 model.auth = async function(req) {
     // Get where and bind values
-    whereBind = await model.prepareBindWhere({email:req.email});    
+    whereBind = await model.prepareBindWhere({
+        email: req.email
+    });
     sql = "SELECT *  FROM " + table + whereBind.where;
 
     // Get data
     result = await model.execute(sql, whereBind.bind);
     if (result.length > 0) {
-        data = result[0]; 
-        if(data.password != req.password) {
-            return 'Invalid';    
+        data = result[0];
+        if (data.password != req.password) {
+            return 'Invalid';
         } else {
             delete data.password;
-            return data;    
-        }            
+            return data;
+        }
     } else {
         return 'NotFound';
     }

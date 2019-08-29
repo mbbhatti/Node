@@ -23,10 +23,10 @@ sendEmail = function(res, customer, orderId, helper) {
     transporter = nodeMailer.createTransport(mailerConfig);
 
     html = '';
-    html += "Hello " + customer.data.name + ",";
-    html += "<p>You have made your order successfully!</p>";
-    html += "<p>Regards,</p>";
-    html += "<p>"+process.env.ADMIN_NAME+"</p>";
+    html += 'Hello ' + customer.data.name + ',';
+    html += '<p>You have made your order successfully!</p>';
+    html += '<p>Regards,</p>';
+    html += '<p>' + process.env.ADMIN_NAME + '</p>';
 
     mailOptions = {
         from: process.env.ADMIN_EMAIL,
@@ -42,7 +42,9 @@ sendEmail = function(res, customer, orderId, helper) {
                 'message': error
             });
         } else {
-            helper.display(res, {'orderId': orderId}, 200);
+            helper.display(res, {
+                'orderId': orderId
+            }, 200);
         }
     });
 }

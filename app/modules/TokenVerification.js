@@ -11,7 +11,7 @@ verify = function(req, res, jwt) {
     // Get USER-KEY token
     token = req.headers['user-key'];
 
-    if (token == "" || token == undefined) {
+    if (token == '' || token == undefined) {
         output = {
             'code': 'AUT_01',
             'message': 'Authorization code is empty'
@@ -30,6 +30,7 @@ verify = function(req, res, jwt) {
             }
         });
     }
+
     return output;
 }
 
