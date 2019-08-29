@@ -13,10 +13,8 @@ verify = function(req, res, jwt) {
 
     if (token == "" || token == undefined) {
         output = {
-            'status': 401,
             'code': 'AUT_01',
-            'message': 'Authorization code is empty',
-            'field': 'USER-KEY'
+            'message': 'Authorization code is empty'
         };
     } else {
         // Get and verify key
@@ -24,10 +22,8 @@ verify = function(req, res, jwt) {
         jwt.verify(token, process.env.AUTH_SECRET_TOKEN, function(err, decoded) {
             if (err) {
                 output = {
-                    'status': 401,
                     'code': 'AUT_02',
-                    'message': 'Access Unauthorized',
-                    'field': 'USER-KEY'
+                    'message': 'Access Unauthorized'
                 };
             } else {
                 output = decoded;

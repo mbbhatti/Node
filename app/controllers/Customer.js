@@ -22,8 +22,7 @@ module.exports = {
 	    validator.check().then(function (matched) {
 	        if (!matched) {	        	
 			    helper.display(res, validation.message(validator.errors));
-	        } else {	
-
+	        } else {
 	        	// Set auth data
 		    	data = {
 		    		email	: req.body.email,
@@ -33,53 +32,49 @@ module.exports = {
 		    				)
 		    	};
 
-				// DB read process 
-				customerModel.setDB(req.db);		    	
-	        	customerModel.auth(data, function(err, response) {
-					if (!err) {
-						tokenData = {
-							customer_id: response.customer_id,
-							name: response.name,
-							email: response.email,
-							role: 'customer'
-						}
-						// Set bearer token
-						token = jwt.sign(
-							{data: tokenData}, 
-							process.env.AUTH_SECRET_TOKEN, 
-							{ expiresIn: process.env.AUTH_TOKEN_TIME }
-						);
-						output = {
-							'customer': {'schema':response}, 
-							'accessToken':'Bearer '+token,
-							'expires_in' : process.env.AUTH_TOKEN_TIME
-						};
-						helper.display(res, output, 200);
-					} else {
-						if(response == 'Invalid') {
-							output = {
-								'status': 400,
-								'code': 'USR_01',
-								'message': "Email or Password is invalid",
-								'field': 'password'
-							};
-						} else if(response == '') {
-							output = {
-								'status': 400,
-								'code': 'USR_05',
-								'message': "The email doesn't exist.",
-								'field': 'email'
-							};
-						} else {
-							output = {
-								'status': 400,
-								'code': 'USR_05',
-								'message': response,
-								'field': 'DB'
-							};
-						}
-						helper.display(res, output);
-					}
+				// DB read process 				
+				customerModel.auth(data).then((response) => { 
+				  	if(response == 'Invalid') {				
+					    helper.display(res, {
+							'code': 'USR_01',
+							'message': "Email or Password is invalid."
+						});
+				  	} else if(response == 'NotFound') {	
+					    helper.display(res, {
+							'code': 'USR_05',
+							'message': "The email doesn't exist."
+						});
+				  	} else {
+				  		// Set customer data
+					    tokenData = {
+					      customer_id: response.customer_id,
+					      name: response.name,
+					      email: response.email,
+					      role: 'customer'
+					    }
+
+					    // Set bearer token
+					    token = jwt.sign(
+					      {data: tokenData}, 
+					      process.env.AUTH_SECRET_TOKEN, 
+					      { expiresIn: process.env.AUTH_TOKEN_TIME }
+					    );
+					    
+					    // Set response
+					    output = {
+					      'customer': response, 
+					      'accessToken':'Bearer '+token,
+					      'expires_in' : process.env.AUTH_TOKEN_TIME
+					    };
+
+					    // Return response
+					    helper.display(res, output, 200);
+				  	}
+				}).catch((err) => {
+					helper.display(res, {
+						'code': 'USR_10',
+						'message': err
+					});
 				});
 	        }
 	    });
@@ -97,8 +92,7 @@ module.exports = {
 	    validator.check().then(function (matched) {
 	        if (!matched) {		    
 			    helper.display(res, validation.message(validator.errors));
-	        } else {	   
-
+	        } else {
 	        	// Setting new customer data
 	        	data = {
 					name	: req.body.name,
@@ -109,70 +103,58 @@ module.exports = {
 		    				)
 		    	};
 
-				// DB read and write process 
-		    	customerModel.setDB(req.db);	    	
-	        	customerModel.insertRow(data, 'customer_id', function(err, record) {	        						
-					if (!err) {
-						customerModel.getCustomer(record, function(err, response) {
-							if(!err) {								
-								if(response != "") {
-									tokenData = {
-										customer_id: response.customer_id,
-										name: response.name,
-										email: response.email,
-										role: 'customer'
-									}
-									
-									// Set bearer token
-									token = jwt.sign(
-										{data: tokenData}, 
-										process.env.AUTH_SECRET_TOKEN, 
-										{ expiresIn: process.env.AUTH_TOKEN_TIME }
-									);						
-									
-									output = {
-										'customer': {'schema':response}, 
-										'accessToken':'Bearer '+token,
-										'expires_in' : process.env.AUTH_TOKEN_TIME
-									};
-									helper.display(res, output, 200);
-								} else {
-									output = {
-										'status': 404,
-										'code': 'USR_05',
-										'message': "Record doesn't exist",
-										'field': 'email'
-									};
-									helper.display(res, output, 404);
-								}
-							} else {
-								output = {
-									'status': 400,
-									'code': 'USR_04',
-									'message': response,
-									'field': 'DB'
-								};	
-								helper.display(res, output);
-							}	
-						});
-					} else {
-						if(record.original !== undefined) {
-							if(record.original.code == 'ER_DUP_ENTRY') {
-								msg = 'The email already exists.';
-								field = 'email';
-							} else {
-								msg = record.original.sqlMessage;		
-								field = 'DB';
+				// DB read and write process 		    		    	
+	        	customerModel.insertRow(data, 'customer_id')
+	        	.then((record) => {
+					customerModel.getRow('*', {customer_id: record})
+					.then((response) => {
+						if(response == 'NotFound') {	
+							helper.display(res, {
+								'code': 'USR_05',
+								'message': "Record doesn't exist"
+							});						
+						} else {
+							// Set customer data
+							tokenData = {
+								customer_id: response.customer_id,
+								name: response.name,
+								email: response.email,
+								role: 'customer'
 							}
-						}
+							
+							// Set bearer token
+							token = jwt.sign(
+								{data: tokenData}, 
+								process.env.AUTH_SECRET_TOKEN, 
+								{ expiresIn: process.env.AUTH_TOKEN_TIME }
+							);						
+							
+							// Set response
+							output = {
+								'customer': {'schema':response}, 
+								'accessToken':'Bearer '+token,
+								'expires_in' : process.env.AUTH_TOKEN_TIME
+							};
 
-						output = {
-							'status': 400,
-							'code': 'USR_04',
-							'message': msg,
-							'field': field
-						};
-						helper.display(res, output);
+							// Return response
+							helper.display(res, output, 200);
+						}
+					}).catch((err) => {
+					    helper.display(res, ['USR_10', err]);
+					});	
+				}).catch((err) => {
+					if(err.original !== undefined) {
+						if(err.original.code == 'ER_DUP_ENTRY') {
+							helper.display(res, {
+								'code': 'USR_04',
+								'message': 'The email already exists.'
+							});
+						} else {
+							helper.display(res, {
+								'code': 'USR_10',
+								'message': err.original.sqlMessage
+							});							
+						}
 					}
 				});
 	        }
@@ -197,7 +179,7 @@ module.exports = {
 	        	// Check token
 	        	customer_token = verification.verify(req, res, jwt);
 	        	if (typeof customer_token.data == 'undefined') {
-	        		helper.display(res, customer_token, 401);	        	
+	        		helper.display(res, customer_token);	        	
 	        	} else {
 	        		// Set new data
 		        	request_data = {
@@ -256,7 +238,7 @@ module.exports = {
 		    	// Check token
 	        	customer_token = verification.verify(req, res, jwt);
 	        	if (typeof customer_token.data == 'undefined') {
-	        		helper.display(res, customer_token, 401);	        	
+	        		helper.display(res, customer_token);	        	
 	        	} else {
 	        		// Set new data
 		        	request_data = {
@@ -303,7 +285,7 @@ module.exports = {
 	        	// Check token
 	        	customer_token = verification.verify(req, res, jwt);	        	
 	        	if (typeof customer_token.data == 'undefined') {
-	        		helper.display(res, customer_token, 401);	        	
+	        		helper.display(res, customer_token);	        	
 	        	} else {
 	        		// Set new data
 		        	request_data = { 

@@ -7,12 +7,13 @@ model.table_name = table;
 /**
  * Get last inserted cart
  *
- * @param {object} data shopping cart request object
- * @param {function} callback response object
+ * @param {integer} id shopping cart item
  *
- * @return object 
+ * @return string|object 
  */
-model.getLastCart = function(data, callback) {
+model.getLastCart = async function(id) {
+    // Get where and bind values
+    whereBind = await model.prepareBindWhere({item_id:id});    
     sql = `
         SELECT
           sc.item_id,
@@ -28,31 +29,23 @@ model.getLastCart = function(data, callback) {
         INNER JOIN
           product AS p
         ON
-          p.product_id = sc.product_id
-        WHERE
-          sc.item_id = $id `;
+          p.product_id = sc.product_id ` +
+        whereBind.where;
 
-    this.db.query(sql, 
-      { 
-        bind: { id: data.id },
-        type: this.db.QueryTypes.SELECT 
-      }
-    ).then(dbRes => {
-        callback(false, dbRes);
-    }).catch(err => {
-        callback(true, err);
-    });
+    // Return response
+    return await model.execute(sql, whereBind.bind);
 }
 
 /**
  * Get cart data by id
  *
- * @param {integer} cid shopping cart id
- * @param {function} callback response object
+ * @param {integer} id shopping cart id
  *
- * @return object 
+ * @return string|object 
  */
-model.getCartById = function(cid, callback) {
+model.getCartById = async function(id) {
+    // Get where and bind values
+    whereBind = await model.prepareBindWhere({cart_id:id});
     sql = `
         SELECT
           sc.item_id,
@@ -66,56 +59,36 @@ model.getCartById = function(cid, callback) {
         INNER JOIN
           product AS p
         ON
-          p.product_id = sc.product_id
-        WHERE
-          sc.cart_id = $cid `;
+          p.product_id = sc.product_id ` +
+        whereBind.where;
 
-    this.db.query(sql, 
-      { 
-        bind: { cid: cid },
-        type: this.db.QueryTypes.SELECT 
-      }
-    ).then(dbRes => {
-        callback(false, dbRes);
-    }).catch(err => {
-        callback(false, err);
-    });
+    // Return response
+    return await model.execute(sql, whereBind.bind);    
 }
 
 /**
  * Check duplicate cart
  *
  * @param {object} data shopping cart request object
- * @param {function} callback response object
  *
- * @return object 
+ * @return string|object 
  */
-model.checkDuplicate = function(data, callback) {
+model.checkDuplicate = async function(data) {
+    // Get where and bind values
+    whereBind = await model.prepareBindWhere(data);
     sql = `
           SELECT 
             item_id as id, 
             quantity 
-          FROM 
-            ` + table  + `
-          WHERE 
-            cart_id = $cid AND 
-            product_id = $pid AND 
-            attributes = $attributes `;
-    
-    this.db.query(sql, 
-      { 
-        bind: { 
-          cid: data.cart_id,
-          pid: data.product_id,
-          attributes: data.attributes 
-        },
-        type: this.db.QueryTypes.SELECT 
-      }
-    ).then(dbRes => {
-        callback(false, dbRes[0]);
-    }).catch(err => {
-        callback(false, err);
-    });
+          FROM ` + 
+          table + 
+          whereBind.where;
+
+    // Get data
+    result = await model.execute(sql, whereBind.bind);
+
+    // Return response
+    return result[0];
 }
 
 module.exports = model;

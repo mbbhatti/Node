@@ -21,8 +21,7 @@ module.exports = {
 	    validator.check().then(function (matched) {
 	        if (!matched) {		    
 			    helper.display(res, validation.message(validator.errors));
-	        } else {	   
-
+	        } else {
 	        	// Setting charge data
 		    	stripe.charges.create({
 					amount: req.body.amount, // 100
@@ -33,14 +32,11 @@ module.exports = {
 				}, function(err, charge) {
 				  	if(!err) {
 						helper.display(res, charge, 200);									
-					} else {
-						output = {
-							'status': 406,
-							'code': 'STR_03',
-							'message': err.message,
-							'field': 'Stripe'
-						};						
-						helper.display(res, output, 406);
+					} else {						
+						helper.display(res, {
+			                'code': 'STR_03',
+			                'message': err.message
+			            });
 					}	
 				});	
 	        }

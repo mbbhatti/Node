@@ -31,6 +31,7 @@ Use this command to create .env file and make setting for email, database, auth 
 
 # Documentation 
 - https://github.com/mbbhatti/turing/blob/master/doc/API-Documentation.pdf
+- https://github.com/mbbhatti/turing/blob/master/doc/API-Documentation.docx
 
 # Run || Test
 Use this command on localhost

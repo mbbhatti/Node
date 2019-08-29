@@ -120,7 +120,11 @@ describe("Customer", function() {
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);
-                res.status.should.equal(200);
+                if(res.body.error.status == 302){
+                    res.status.should.equal(302);
+                } else {
+                    res.status.should.equal(200);
+                }                
             } else {
                 //console.log(res.error.text);
             }
@@ -176,7 +180,7 @@ describe("Customer", function() {
         .send({
             name: "abc",
             email: 'mbbhatti@xyz.com',
-            password: '123456'
+            password: ''
         })
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
@@ -225,7 +229,11 @@ describe("Customer", function() {
         .end(function(err, res) {
             if (res.error == false) {
                 //console.log(res.text);
-                res.status.should.equal(200);
+                if(res.body.error.status == 302){
+                    res.status.should.equal(302);
+                } else {
+                    res.status.should.equal(200);
+                } 
             } else {
                 //console.log(res.error.text);
             }

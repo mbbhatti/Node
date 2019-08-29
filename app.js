@@ -2,11 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Sequelize = require('sequelize');
 const dotenv = require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 
 module.exports = {
 	name: "Backend",
 	run: function() {
-
         app = express();                
         app.use(bodyParser.urlencoded({extended: true}));
         app.use(bodyParser.json());
@@ -16,9 +17,13 @@ module.exports = {
             console.log('Listening on ', process.env.APP_URL +':'+ process.env.APP_PORT);
         }); 
 
-		this.routes(app);
+        // Set DB connection
+		this.connection();
+
+        // Set app routes
+        this.routes(app);        
 	},
-    routes: function(app) { 
+    connection: function() {
         next = function(req, res) {
             console.log('next(req, res)');
         }
@@ -30,29 +35,48 @@ module.exports = {
             logging: false // Hide query at console
         });
 
-        attachSQLDB = function(req, res, next)
+        db = function(req, res, next)
         {            
-            sqldb.authenticate().then(() => {                
-                req.db = sqldb;            
+            sqldb.authenticate().then(() => {                                
                 next();                  
             }).catch(err => {
-                msg = 'Unable to connect to the database, check .env file for database configuration';
-                console.log(msg);                
+                msg = 'Unable to connect to the database, check .env file for database configuration';                               
 
                 res.contentType('application/json');   
                 res.status(500);             
                 res.write(JSON.stringify({'error': msg}));
                 res.end();              
             });
-        };  
+        };
 
-        customerRoute = require('./routes/customer')(app, attachSQLDB, next);
-        productRoute = require('./routes/product')(app, attachSQLDB, next);
-        shoppingCartRoute = require('./routes/shoppingCart')(app, attachSQLDB, next);
-        stripeRoute = require('./routes/stripe')(app, attachSQLDB, next);
-        orderRoute = require('./routes/order')(app, attachSQLDB, next);
+        // Assign database object to the models
+        this.models(sqldb);
+    },
+    models: function(sqldb) {
+        const basename = path.basename(__filename);
+        const modelDir = "./app/models/api/";
 
-    }
+        fs.readdirSync(modelDir).filter(file => {            
+            return file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js';
+        })
+        .forEach(file => {
+            fileName = file.split('.').slice(0, -1).join('.');            
+            fileName = require(modelDir + fileName);
+            fileName.setDB(sqldb);
+        });
+    },
+    routes: function(app) { 
+        next = function(req, res) {
+            console.log('next(req, res)');
+        }
+
+        // Define routes
+        customerRoute = require('./routes/customer')(app, next);
+        productRoute = require('./routes/product')(app, next);
+        shoppingCartRoute = require('./routes/shoppingCart')(app, next);
+        stripeRoute = require('./routes/stripe')(app, next);
+        orderRoute = require('./routes/order')(app, next);
+    }    
 };
 
 module.exports.run();

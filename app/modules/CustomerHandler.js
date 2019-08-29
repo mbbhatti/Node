@@ -10,20 +10,22 @@
  *
  * @return object
  */
-update = function(req, res, customerData, requestData, customerModel, cstHelper) {        
-    customerModel.setDB(req.db);
-    customerModel.updateRow(requestData, customerData, function(error, response) {
-        if (!error) {
-            cstHelper.display(res, response, 200);
-        } else {
-            output = {
-                'status': 404,
+update = function(req, res, customerData, requestData, customerModel, cstHelper) {    
+    customerModel.updateRow(requestData, customerData).then((response) => {
+        if (response == 'NotFound') {
+            cstHelper.display(res, {
                 'code': 'USR_05',
-                'message': "Record doesn't exist",
-                'field': 'DB'
-            };
-            cstHelper.display(res, output, 404);
+                'message': "Record doesn't exist"
+            });
+        } else {
+            // Return data
+            cstHelper.display(res, response, 200);
         }
+    }).catch((err) => {
+        cstHelper.display(res, {
+            'code': 'USR_10',
+            'message': err
+        });
     });
 }
 

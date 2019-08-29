@@ -8,20 +8,18 @@ model.table_name = table;
  * Bulk insert order detail
  *
  * @param {object} data object
- * @param {object} order object
- * @param {function} callback response object
+ * @param {integer} orderId represent order id
  *
- * @return object 
+ * @return string|object  
  */
-model.insertOrderDetail = function(data, order, callback) {
-	
+model.insertOrderDetail = async function(data, orderId) {	
 	fields = 'item_id, order_id, product_id, attributes, product_name, quantity, unit_cost';
 	values = '';
 
 	for (i = 0; i < data.length; i++) {
 		temp = '("'+
 					data[i].item_id+
-					'", "'+order.id+
+					'", "'+orderId+
 					'","'+data[i].product_id+
 					'","'+data[i].attributes+
 					'","'+data[i].name+
@@ -36,14 +34,14 @@ model.insertOrderDetail = function(data, order, callback) {
     values = values.substr(0, values.length - 1);
 
     sql = "INSERT INTO " + table + " (" + fields + ") VALUES " + values;	
-    this.db.query(sql).then(results => {
+    return await this.db.query(sql).then(results => {
         if (results.length > 0) {
-            callback(false, results[0]);
+        	return results[0];
         } else {
-            callback(true, results);
+            return results;
         }
     }).catch(function(err) {
-        callback(true, err);
+        throw (err.original.sqlMessage);
     });
 };
 

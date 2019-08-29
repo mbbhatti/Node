@@ -20,7 +20,7 @@ module.exports.prototype = {
     setDB: function(db) {
         this.db = db;
     },
-    prepareInsertQuery: function(dataArray, table_name) {
+    prepareInsertQuery: async function(dataArray, table_name) {
         fields = '';
         values = '';
         sql = '';
@@ -41,7 +41,7 @@ module.exports.prototype = {
         sql = "INSERT INTO " + table_name + " (" + fields + ") VALUES (" + values + ")";
         return sql;
     },
-    prepareAttributes: function(attr) {
+    prepareAttributes: async function(attr) {
         selection = '';
         for (i = 0; i < attr.length; i++) {
             //-- Dont add space after comma for formatting it is part of logic
@@ -54,106 +54,7 @@ module.exports.prototype = {
         return selection;
 
     },
-    insertRow: function(data, attr, callback) {
-        self = this;
-        sql = self.prepareInsertQuery(data, self.table_name);
-
-        this.db.query(sql).then(() => {
-            sql = "SELECT MAX(" + attr + ") as id FROM " + self.table_name;
-            self.db.query(sql, 
-                { type: this.db.QueryTypes.SELECT }
-            ).then(dbRes => {
-                if (dbRes.length > 0) {
-                    callback(false, dbRes[0]);
-                } else {
-                    callback(true, 'No record found');
-                }
-            }).catch(err => {
-                callback(true, err);
-            });
-        }).catch(err => {
-            callback(true, err);
-        });
-    },
-    getRow: function(attr, where, callback) {        
-        type = typeof attr;
-        
-        if (type == "object") {
-            attr = this.prepareAttributes(attr);
-        }
-        
-        if (where != '' || where != 'undefined' || where != null) {
-            where = " WHERE " + where
-        } else {
-            where = '';
-        }
-
-        sql = "SELECT " + attr + " FROM " + this.table_name + " " + where;
-        this.db.query(sql, 
-            { type: this.db.QueryTypes.SELECT }
-        ).then(dbRes => {
-            data = dbRes[0];
-            delete data.password;
-            callback(false, data);
-        }).catch(err => {
-            callback(true, err);
-        });
-
-    },
-    updateRow: function(data, fields, callback) {
-        field_type = typeof fields;        
-        data_type = typeof data;
-        update_attr = '';
-        bind = {};
-        where = '';
-
-        if(field_type == "object") {
-            for (field in fields) {                
-                where = where.concat(field + " = $" + field + " AND ");                 
-                bind[field] = fields[field];
-            }
-            //-- Remove the last word
-            where = " WHERE " + where.substr(0, where.length - 4);            
-        }
-
-        if (data_type == "object") {
-            for (item in data) {
-                //-- Dont add space after comma
-                update_attr = update_attr.concat(item + "='" + data[item] + "',"); 
-            }
-            
-            //-- Remove the last character which is comma
-            update_attr = update_attr.substr(0, update_attr.length - 1); 
-        } else {
-            update_attr = data;
-        }        
-
-        sql = "UPDATE " + this.table_name + " SET " + update_attr + " " + where;
-        this.db.query(sql, { bind: bind }).then(dbRes => {
-            sql = "SELECT * FROM " + this.table_name + where;
-            this.db.query(sql, 
-                { 
-                    bind: bind, 
-                    type: this.db.QueryTypes.SELECT 
-                }
-            ).then(dbRes => {
-                if (dbRes.length > 0) {
-                    data = dbRes[0];
-                    if(data.password != undefined) {
-                        delete data.password;
-                    }
-                    callback(false, data);
-                } else {
-                    callback(false, '');
-                }
-            }).catch(err => {
-                callback(true, err);
-            });
-        }).catch(err => {
-            callback(true, err);
-        });
-    },
-    deleteRow: function(fields, callback) {
+    prepareBindWhere: async function(fields) {
         type = typeof fields;        
         bind = {};
         where = '';
@@ -166,16 +67,115 @@ module.exports.prototype = {
             //-- Remove the last word
             where = " WHERE " + where.substr(0, where.length - 4);            
         }
+
+        return {
+            'bind' : bind,
+            'where': where
+        }
+
+    },
+    insertRow: async function(data, attr) {
+        self = this;
+        sql = await self.prepareInsertQuery(data, self.table_name);
+
+        return await this.db.query(sql).then(dbRes => {
+            return dbRes[0];
+        }).catch(err => {
+            throw (err);
+        });
+    },
+    getRow: async function(attr, fields) {
+        self = this;
+        type = typeof attr;
         
-        sql = "DELETE  FROM " + this.table_name + " " + where;
-        this.db.query(sql, { bind: bind }).then(dbRes => {
-            if (dbRes[0].affectedRows > 0) {
-                callback(false, '');
+        if (type == "object") {
+            attr = await self.prepareAttributes(attr);
+        }
+
+        if(fields.bind == undefined) {
+            condition = await self.prepareBindWhere(fields);        
+        } else {
+            condition = fields;        
+        }
+
+        sql = "SELECT " + attr + " FROM " + self.table_name + condition.where;
+        return await this.db.query(sql, 
+            { 
+                bind: condition.bind, 
+                type: this.db.QueryTypes.SELECT 
+            }
+        ).then(dbRes => {
+            if (dbRes.length > 0) {
+                data = dbRes[0];
+                if(data.password != undefined) {
+                    delete data.password;
+                }
+                return data;
             } else {
-                callback(true, '');
+                return 'NotFound';
             }
         }).catch(err => {
-            callback(true, err);
+            throw (err.original.sqlMessage);
+        });
+
+    },
+    updateRow: async function(data, fields) { 
+        self = this;               
+        type = typeof data;
+        update_attr = '';        
+
+        condition = await self.prepareBindWhere(fields);
+        
+        if (type == "object") {
+            for (item in data) {
+                //-- Dont add space after comma
+                update_attr = update_attr.concat(item + "='" + data[item] + "',"); 
+            }
+            
+            //-- Remove the last character which is comma
+            update_attr = update_attr.substr(0, update_attr.length - 1); 
+        } else {
+            update_attr = data;
+        }        
+
+        sql = "UPDATE " + this.table_name + " SET " + update_attr + " " + condition.where;
+        await this.db.query(sql, { bind: condition.bind })
+        .then()
+        .catch(err => {
+            throw (err.original.sqlMessage);
+        });
+
+        return await this.getRow('*', condition);
+    },
+    deleteRow: async function(fields) {
+        self = this;
+        type = typeof fields;
+
+        if(type == "object") {
+            condition = await self.prepareBindWhere(fields);            
+        }
+        
+        sql = "DELETE  FROM " + this.table_name + " " + condition.where;
+        return await this.db.query(sql, { bind: condition.bind }).then(dbRes => {
+            if (dbRes[0].affectedRows > 0) {
+                return '';
+            } else {
+                return 'NotFound';
+            }
+        }).catch(err => {
+            throw (err.original.sqlMessage);
+        });
+    },
+    execute: async function(sql, bind = '') {
+        return await this.db.query(sql, 
+            { 
+                bind: bind,
+                type: this.db.QueryTypes.SELECT  
+            }
+        ).then(dbRes => {
+            return dbRes;
+        }).catch(err => {
+            throw (err.original.sqlMessage);
         });
     }
 };

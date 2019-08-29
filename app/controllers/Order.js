@@ -29,13 +29,12 @@ module.exports = {
 	        } else {
 	        	customer = verification.verify(req, res, jwt);
 	        	if (typeof customer.data == 'undefined') {
-	        		helper.display(res, customer, 401);	        	
+	        		helper.display(res, customer);	        	
 	        	} else {					  		
-			  		// DB get shopping cart and product data 
-			    	shoppingCartModel.setDB(req.db);	    						    				    	
-			    	shoppingCartModel.getCartById(req.body.cart_id, function(err, cartData) {			    		
-			    		if(!err && cartData !== undefined && cartData.length > 0) {
-			    			
+			  		// DB get shopping cart and product data						    				    	
+			    	shoppingCartModel.getCartById(req.body.cart_id)
+			    	.then((cartData) => { 			    		
+			    		if(cartData !== undefined && cartData.length > 0) {			    			
 			    			// Caculate total price with quantity
 			    			total_amount = 0;
 			    			total_entries = -1;
@@ -60,69 +59,48 @@ module.exports = {
 					    	};
 
 					    	// DB add order
-					    	orderModel.setDB(req.db);
-			    			orderModel.insertRow(order_data, 'order_id', function(err, ordRes) {					
-								if (!err) {
-									// DB add order detail
-									orderDetailModel.setDB(req.db);
-									orderDetailModel.insertOrderDetail(cartData, ordRes, function(err, detRes) {
-										if (!err) {
-											// Set request data
-	        								data = {cart_id: req.body.cart_id};
+			    			orderModel.insertRow(order_data, 'order_id')
+			    			.then((ordId) => {				    				
+								// DB add order detail
+								orderDetailModel.insertOrderDetail(cartData, ordId)
+								.then((detRes) => {
+										// Set request data
+        								data = {cart_id: req.body.cart_id};
 
-											// DB delete shopping cart entry 
-									    	shoppingCartModel.setDB(req.db);	    	
-								        	shoppingCartModel.deleteRow(data, function(err, response) {								        			        		
-												if (!err) {				
-													// send Order confirmation email											
-													order.sendEmail(res, customer, ordRes, helper);														
-												} else {
-													output = {
-														'status': 400,
-														'code': 'OR_04',
-														'message': 'Check Email Configuration',
-														'field': ''
-													};						
-													helper.display(res, output);
-												}
-											});													
-										} else {
-											if(detRes.original !== undefined) {
-												msg = detRes.original.sqlMessage;		
-											}
-
-											output = {
-												'status': 400,
-												'code': 'OR_04',
-												'message': msg,
-												'field': 'DB'
-											};						
-											helper.display(res, output);
-										}
-									});						  		
-								} else {									
-									if(ordRes.original !== undefined) {
-										msg = ordRes.original.sqlMessage;		
-									}
-
-									output = {
-										'status': 400,
-										'code': 'OR_04',
-										'message': msg,
-										'field': 'DB'
-									};						
-									helper.display(res, output);
-								}
+										// DB delete shopping cart entry 	    	
+							        	shoppingCartModel.deleteRow(data)
+							        	.then((response) => {		
+											// send Order confirmation email											
+											order.sendEmail(res, customer, ordId, helper);														
+										}).catch((err) => {
+											helper.display(res, {
+												'code': 'OR_10',
+												'message': err
+											});											
+										});													
+								}).catch((err) => {
+									helper.display(res, {
+										'code': 'OR_10',
+										'message': err
+									});								
+								});						  		
+							}).catch((err) => {
+								helper.display(res, {
+									'code': 'OR_10',
+									'message': err
+								});								
 							});
 			    		} else {
-			    			output = {
-								'status': 400,
+			    			helper.display(res, {
 								'code': 'OR_03',
-								'message': "Cart ID doesn't exist",
-								'field': 'cart_id'
-							};						
-							helper.display(res, output);
+								'message': "Cart ID doesn't exist"
+							});
 			    		}
+			    	}).catch((err) => {
+			    		helper.display(res, {
+							'code': 'OR_10',
+							'message': err
+						}); 
 			    	});				        	
 				}					
 			}

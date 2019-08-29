@@ -5,12 +5,12 @@ const nodeMailer = require('nodemailer');
  * 
  * @param {object} res express response object
  * @param {object} customer has customer data
- * @param {object} product contains product data
+ * @param {object} orderId for order id
  * @param {object} helper response message
  *
  * @return object
  */
-sendEmail = function(res, customer, product, helper) {
+sendEmail = function(res, customer, orderId, helper) {
     mailerConfig = {
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,
@@ -37,12 +37,12 @@ sendEmail = function(res, customer, product, helper) {
 
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
-            helper.display(res, error, 400);
+            helper.display(res, {
+                'code': 'E_01',
+                'message': error
+            });
         } else {
-            output = {
-                'orderId': product.id
-            };
-            helper.display(res, output, 200);
+            helper.display(res, {'orderId': orderId}, 200);
         }
     });
 }

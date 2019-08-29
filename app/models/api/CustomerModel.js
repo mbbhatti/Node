@@ -8,75 +8,27 @@ model.table_name = table;
  * User Auth
  *
  * @param {object} req customer info object
- * @param {function} callback response object
  *
  * @return string|object 
  */
-model.auth = function(req, callback) {
-    sql = ` 
-        SELECT 
-            * 
-        FROM 
-        ` + table + `
-        WHERE 
-            email = $email `;
-    
-    this.db.query(sql, 
-        { 
-            bind: { email: req.email }, 
-            type: this.db.QueryTypes.SELECT 
-        }
-    ).then(dbRes => {
-        if (dbRes.length > 0) {
-            data = dbRes[0]; 
-            if(data.password != req.password) {
-                callback(true, 'Invalid');    
-            } else {
-                delete data.password;
-                callback(false, data);    
-            }            
-        } else {
-            callback(true, '');
-        }
-    }).catch(err => {
-        callback(true, err);
-    });
-}
+model.auth = async function(req) {
+    // Get where and bind values
+    whereBind = await model.prepareBindWhere({email:req.email});    
+    sql = "SELECT *  FROM " + table + whereBind.where;
 
-/**
- * Get last inserted customer record
- * Removes password field from result
- *
- * @param {object} data customer id
- * @param {function} callback response object
- *
- * @return string|object 
- */
-model.getCustomer = function(data, callback) {    
-    sql = ` 
-        SELECT 
-            * 
-        FROM 
-        ` + table + `
-        WHERE 
-            customer_id = $id `;
-    
-    this.db.query(sql, 
-        { 
-            bind: { id: data.id },
-            type: this.db.QueryTypes.SELECT 
-        }
-    ).then(dbRes => {
-        if (dbRes.length > 0) {
-            data = dbRes[0]; 
-            delete data.password;
-            callback(false, data);
+    // Get data
+    result = await model.execute(sql, whereBind.bind);
+    if (result.length > 0) {
+        data = result[0]; 
+        if(data.password != req.password) {
+            return 'Invalid';    
         } else {
-            callback(false, '');
-        }
-    }).catch(err => {
-        callback(true, err);
-    });
+            delete data.password;
+            return data;    
+        }            
+    } else {
+        return 'NotFound';
+    }
 }
 
 module.exports = model;

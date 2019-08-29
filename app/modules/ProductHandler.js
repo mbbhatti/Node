@@ -25,36 +25,36 @@ find = function(req, res, productModel, cstHelper) {
     pid = (req.params.product_id == undefined || req.params.product_id == '') 
                 ? '' : req.params.product_id;
     
-    productModel.setDB(req.db);   
-
     if(cid > 0 || did > 0) {
-        productModel.getByCatProId(page, limit, desLen, cid, did, 
-            function(err, data) {
-                if(err) {
-                    cstHelper.display(res, data, 400);
-                } else {
-                    cstHelper.display(res, data, 200);
-                }           
-            }
-        );
+        productModel.getByCatProId(page, limit, desLen, cid, did)
+        .then((data) => {
+            cstHelper.display(res, data, 200);                       
+        }).catch((err) => {
+            cstHelper.display(res, {
+                'code': 'PRO_10',
+                'message': err
+            });
+        });
     } else if(pid > 0) {
-        productModel.getById(pid, function(err, data) {            
-            if(err) {
-                cstHelper.display(res, data, 400);
-            } else {
-                cstHelper.display(res, data, 200);  
-            }           
+        productModel.getById({product_id:pid})
+        .then((data) => { 
+            cstHelper.display(res, data, 200);  
+        }).catch((err) => {
+            cstHelper.display(res, {
+                'code': 'PRO_10',
+                'message': err
+            });
         });
     } else {
-        productModel.getProducts(page, limit, desLen, qs, 
-            function(err, data) {
-                if(err) {
-                    cstHelper.display(res, data, 400);
-                } else {
-                    cstHelper.display(res, data, 200);  
-                }          
-            }
-        );
+        productModel.getProducts(page, limit, desLen, qs)
+        .then((data) => { 
+            cstHelper.display(res, data, 200);  
+        }).catch((err) => {
+            cstHelper.display(res, {
+                'code': 'PRO_10',
+                'message': err
+            });
+        });
     }    
 }
 
