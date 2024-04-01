@@ -10,43 +10,41 @@ const nodeMailer = require('nodemailer');
  *
  * @return object
  */
-sendEmail = function(res, customer, orderId, helper) {
-    mailerConfig = {
+exports.sendEmail = function(res, customer, orderId, helper) {
+    // Create transporter with mailer configuration
+    const transporter = nodeMailer.createTransport({
         host: process.env.MAIL_HOST,
         port: process.env.MAIL_PORT,
         auth: {
             user: process.env.MAIL_USERNAME,
             pass: process.env.MAIL_PASSWORD
         }
-    };
+    });
 
-    transporter = nodeMailer.createTransport(mailerConfig);
+    // Compose email HTML content
+    const html = `
+        <p>Hello ${customer.data.name},</p>
+        <p>You have made your order successfully!</p>
+        <p>Regards,</p>
+        <p>${process.env.ADMIN_NAME}</p>
+    `;
 
-    html = '';
-    html += 'Hello ' + customer.data.name + ',';
-    html += '<p>You have made your order successfully!</p>';
-    html += '<p>Regards,</p>';
-    html += '<p>' + process.env.ADMIN_NAME + '</p>';
-
-    mailOptions = {
+    // Set mail options
+    const mailOptions = {
         from: process.env.ADMIN_EMAIL,
         to: customer.data.email,
         subject: 'Order Confirmation',
         html: html
     };
 
+    // Send email
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
-            helper.display(res, {
-                'code': 'E_01',
-                'message': error
-            });
+            // Handle email sending error
+            helper.display(res, {'code': 'E_01', 'message': error.message || 'Failed to send email'});
         } else {
-            helper.display(res, {
-                'orderId': orderId
-            }, 200);
+            // Display success response
+            helper.display(res, {'orderId': orderId}, 200);
         }
     });
 }
-
-exports.sendEmail = sendEmail;

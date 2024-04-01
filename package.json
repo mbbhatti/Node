@@ -4,7 +4,7 @@
     "scripts": {
         "test": "mocha",
         "copy": "cp .env.example .env",
-        "start": "concurrently \"node app.js\""
+        "start": "node app/index.js"
     },
     "dependencies": {
         "async": "^1.5.2",
@@ -25,6 +25,8 @@
     "devDependencies": {
         "mocha": "^6.1.4",
         "should": "^13.2.3",
-        "supertest": "^4.0.2"
+        "supertest": "^4.0.2",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.0"
     }
 }

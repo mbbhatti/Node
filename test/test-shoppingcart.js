@@ -1,9 +1,15 @@
-var supertest = require("supertest");
-var should = require("should");
+const supertest = require("supertest");
+const should = require("should");
 const dotenv = require('dotenv').config();
 
-// PORT reference, where program is runninng.
-var server = supertest.agent(process.env.APP_URL +':'+ process.env.APP_PORT);
+// Make sure environment variables are properly set
+if (!process.env.URL || !process.env.PORT) {
+    console.error("Please set the URL and PORT environment variables.");
+    process.exit(1);
+}
+
+// PORT reference, where program is running
+const server = supertest.agent(process.env.URL + ':' + process.env.PORT);
 
 describe("Shopping Cart", function() {
 
@@ -18,11 +24,8 @@ describe("Shopping Cart", function() {
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
+            if (res.error === false) {
                 res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
             }
             done();
         });
@@ -39,11 +42,8 @@ describe("Shopping Cart", function() {
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
+            if (res.error === false) {
                 res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
             }
             done();
         });
@@ -54,11 +54,8 @@ describe("Shopping Cart", function() {
         .delete('/shoppingcart/empty/100')
         .expect(200)
         .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
+            if (res.error === false) {
                 res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
             }
             done();
         });
@@ -69,11 +66,8 @@ describe("Shopping Cart", function() {
         .delete('/shoppingcart/empty/')
         .expect(200)
         .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
+            if (res.error === false) {
                 res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
             }
             done();
         });
@@ -84,11 +78,8 @@ describe("Shopping Cart", function() {
         .delete('/shoppingcart/removeProduct/100')
         .expect(200)
         .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
+            if (res.error === false) {
                 res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
             }
             done();
         });
@@ -99,11 +90,8 @@ describe("Shopping Cart", function() {
         .delete('/shoppingcart/removeProduct/')
         .expect(200)
         .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
+            if (res.error === false) {
                 res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
             }
             done();
         });
@@ -115,11 +103,8 @@ describe("Shopping Cart", function() {
         .expect("Content-type", /x-www-form-urlencoded/)
         .expect(200)
         .end(function(err, res) {
-            if (res.error == false) {
-                //console.log(res.text);
+            if (res.error === false) {;
                 res.status.should.equal(200);
-            } else {
-                //console.log(res.error.text);
             }
             done();
         });

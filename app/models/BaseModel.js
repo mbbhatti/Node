@@ -59,121 +59,115 @@ module.exports.prototype = {
         return selection;
     },
     prepareBindWhere: async function(fields) {
-        type = typeof fields;
-        bind = {};
-        where = '';
-
-        if (type == "object") {
-            for (field in fields) {
-                where = where.concat(field + " = $" + field + " AND ");
-                bind[field] = fields[field];
-            }
-            //-- Remove the last word
-            where = " WHERE " + where.substr(0, where.length - 4);
+        if (typeof fields !== "object") {
+            return { bind: {}, where: '' };
         }
 
-        return {
-            'bind': bind,
-            'where': where
-        }
+        const bind = {};
+        let where = '';
 
-    },
-    insertRow: async function(data, attr) {
-        self = this;
-        sql = await self.prepareInsertQuery(data, self.table_name);
-
-        return await this.db.query(sql).then(dbRes => {
-            return dbRes[0];
-        }).catch(err => {
-            throw (err);
+        Object.entries(fields).forEach(([field, value]) => {
+            where += `${field} = $${field} AND `;
+            bind[field] = value;
         });
+
+        if (where.length > 0) {
+            where = ' WHERE ' + where.slice(0, -5); // Remove the last 'AND' and space
+        }
+
+        return { bind, where };
+    },
+    insertRow: async function(data) {
+        self = this;
+        const sql = await self.prepareInsertQuery(data, self.table_name);
+
+        return await this.db.query(sql)
+            .then(dbRes => {
+                return dbRes[0];
+            })
+            .catch(error => {
+                throw (error);
+            });
+    },
+    updateRow: async function(data, fields, status = false) {
+        try {
+            const condition = await this.prepareBindWhere(fields);
+            const updateAttributes = this.generateUpdateAttributes(data);
+
+            const sql = `UPDATE ${this.table_name} SET ${updateAttributes} ${condition.where}`;
+
+            await this.db.query(sql, {
+                bind: condition.bind
+            });
+
+            if (status) {
+                return status;
+            }
+
+            const updatedRecord = await this.getRow('*', condition);
+            if (!updatedRecord) {
+                return null;
+            }
+
+            return updatedRecord;
+        } catch (error) {
+            throw (error);
+        }
+    },
+    generateUpdateAttributes: function(data) {
+        if (typeof data === 'object') {
+            return Object.entries(data)
+                .map(([key, value]) => `${key}='${value}'`)
+                .join(',');
+        } else {
+            return data;
+        }
     },
     getRow: async function(attr, fields) {
-        self = this;
-        type = typeof attr;
+        try {
+            const attributes = typeof attr === "object" ? await this.prepareAttributes(attr) : attr;
+            const condition = fields.bind === undefined ? await this.prepareBindWhere(fields) : fields;
+            const sql = `SELECT ${attributes} FROM ${this.table_name} ${condition.where}`;
 
-        if (type == "object") {
-            attr = await self.prepareAttributes(attr);
-        }
+            const dbRes = await this.db.query(sql, { bind: condition.bind, type: this.db.QueryTypes.SELECT });
 
-        if (fields.bind == undefined) {
-            condition = await self.prepareBindWhere(fields);
-        } else {
-            condition = fields;
-        }
-
-        sql = "SELECT " + attr + " FROM " + self.table_name + condition.where;
-
-        return await this.db.query(sql, {
-            bind: condition.bind,
-            type: this.db.QueryTypes.SELECT
-        }).then(dbRes => {
-            if (dbRes.length > 0) {
-                data = dbRes[0];
-                if (data.password != undefined) {
+            if (dbRes && dbRes.length > 0) {
+                const data = dbRes[0];
+                if (data.password !== undefined) {
                     delete data.password;
                 }
                 return data;
             } else {
-                return 'NotFound';
+                return null;
             }
-        }).catch(err => {
-            throw (err.original.sqlMessage);
-        });
-
-    },
-    updateRow: async function(data, fields) {
-        self = this;
-        type = typeof data;
-        update_attr = '';
-
-        condition = await self.prepareBindWhere(fields);
-
-        if (type == "object") {
-            for (item in data) {
-                //-- Dont add space after comma
-                update_attr = update_attr.concat(item + "='" + data[item] + "',");
-            }
-
-            //-- Remove the last character which is comma
-            update_attr = update_attr.substr(0, update_attr.length - 1);
-        } else {
-            update_attr = data;
+        } catch (err) {
+            throw new Error(err.original?.sqlMessage || err.message);
         }
-
-        sql = "UPDATE " + this.table_name + " SET " + update_attr + " " + condition.where;
-
-        await this.db.query(sql, {
-                bind: condition.bind
-            })
-            .then()
-            .catch(err => {
-                throw (err.original.sqlMessage);
-            });
-
-        return await this.getRow('*', condition);
     },
     deleteRow: async function(fields) {
-        self = this;
-        type = typeof fields;
+        const type = typeof fields;
 
-        if (type == "object") {
-            condition = await self.prepareBindWhere(fields);
+        let condition = null;
+
+        if (type === "object") {
+            condition = await this.prepareBindWhere(fields);
         }
 
-        sql = "DELETE  FROM " + this.table_name + " " + condition.where;
+        const sql = `DELETE FROM ${this.table_name} ${condition ? condition.where : ''}`;
 
-        return await this.db.query(sql, {
-            bind: condition.bind
-        }).then(dbRes => {
-            if (dbRes[0].affectedRows > 0) {
-                return '';
+        try {
+            const dbRes = await this.db.query(sql, {
+                bind: condition ? condition.bind : null
+            });
+
+            if (dbRes && dbRes[0].affectedRows > 0) {
+                return true;
             } else {
-                return 'NotFound';
+                return null;
             }
-        }).catch(err => {
-            throw (err.original.sqlMessage);
-        });
+        } catch (err) {
+            throw err.original.sqlMessage;
+        }
     },
     execute: async function(sql, bind = '') {
         return await this.db.query(sql, {

@@ -7,24 +7,18 @@
  *
  * @return object 
  */
-verify = function(req, res, jwt) {
-    // Get USER-KEY token
-    token = req.headers['user-key'];
+exports.verify = function(req, res, jwt) {
+    let output;
 
-    if (token == '' || token == undefined) {
-        output = {
-            'code': 'AUT_01',
-            'message': 'Authorization code is empty'
-        };
+    let token = req.headers.authorization; // To Get USER-KEY token as req.headers['user-key'];
+
+    if (!token) {
+        output = {'code': 'AUT_01', 'message': 'Authorization code is empty'};
     } else {
-        // Get and verify key
         token = token.split(/\s+/).pop();
         jwt.verify(token, process.env.AUTH_SECRET_TOKEN, function(err, decoded) {
             if (err) {
-                output = {
-                    'code': 'AUT_02',
-                    'message': 'Access Unauthorized'
-                };
+                output = {'code': 'AUT_02', 'message': 'Access Unauthorized'};
             } else {
                 output = decoded;
             }
@@ -32,6 +26,4 @@ verify = function(req, res, jwt) {
     }
 
     return output;
-}
-
-exports.verify = verify;
+};

@@ -1,4 +1,4 @@
-ShoppingCart = require(__dirname + "/../app/controllers/ShoppingCart");
+ShoppingCart = require(__dirname + "/../controllers/ShoppingCart");
 
 module.exports = function(app, next) {    
     app.post('/shoppingcart/add', function(req, res) {    	

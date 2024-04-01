@@ -12,24 +12,26 @@ model.table_name = table;
  * @return string|object 
  */
 model.auth = async function(req) {
-    // Get where and bind values
-    whereBind = await model.prepareBindWhere({
-        email: req.email
-    });
-    sql = "SELECT *  FROM " + table + whereBind.where;
+    // Prepare WHERE clause and bind values
+    const whereBind = await model.prepareBindWhere({ email: req.email });
+    const sql = `SELECT * FROM ${table} ${whereBind.where}`;
 
-    // Get data
-    result = await model.execute(sql, whereBind.bind);
+    // Execute SQL query
+    const result = await model.execute(sql, whereBind.bind);
+
+    // Check if user exists
     if (result.length > 0) {
-        data = result[0];
-        if (data.password != req.password) {
-            return 'Invalid';
+        const userData = result[0];
+        // Check if passwords match
+        if (userData.password !== req.password) {
+            return false; // Passwords don't match
         } else {
-            delete data.password;
-            return data;
+            delete userData.password; // Remove password from returned data
+
+            return userData; // Return user data
         }
     } else {
-        return 'NotFound';
+        return null; // User not found
     }
 }
 

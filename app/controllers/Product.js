@@ -1,88 +1,63 @@
-const productModel = require(__dirname + "/../models/api/ProductModel");
-const productValidation = require(__dirname + "/../modules/ProductValidation");
-const product = require(__dirname + '/../modules/ProductHandler');
-const helper = require(__dirname + '/../modules/CustomHelper');
-const v = require('node-input-validator');
+const path = require("path");
+const productModel = require(path.join(__dirname, '..', 'models', 'api', 'ProductModel'));
+const productValidation = require(path.join(__dirname, '..', 'utils', 'validation', 'ProductValidation'));
+const product = require(path.join(__dirname, '..', 'utils', 'handler', 'ProductHandler'));
+const helper = require(path.join(__dirname, '..', 'utils', 'CustomHelper'));
+const nodeInputValidation = require('node-input-validator');
 
-const validation = new productValidation();
+async function validate(req, res, validator) {
+    const isValid = await validator.check();
+    if (!isValid) {
+        return helper.display(res, productValidation.message(validator.errors));
+    }
+    product.find(req, res, productModel, helper);
+}
 
 module.exports = {
     name: 'Product',
-    all: function(req, res, next) {
-        validator = new v(req.query, {
-            page: 'integer',
-            limit: 'integer',
-            description_length: 'integer'
-        });
-
-        validator.check().then(function(matched) {
-            if (!matched) {
-                helper.display(res, validation.message(validator.errors));
-            } else {
-                product.find(req, res, productModel, helper);
-            }
-        });
-
+    all: async function(req, res) {
+        try {
+            const validator = new nodeInputValidation(req.query, {
+                page: 'integer',
+                limit: 'integer',
+                description_length: 'integer'
+            });
+            await validate(req, res, validator);
+        } catch (error) {
+            res.status(500).json({ error: error });
+        }
     },
-    search: function(req, res, next) {
-        validator = new v(req.query, {
+    search: async function(req, res, next) {
+        const validator = new nodeInputValidation(req.query, {
             query_string: 'required',
             page: 'integer',
             limit: 'integer',
             description_length: 'integer'
         });
-
-        validator.check().then(function(matched) {
-            if (!matched) {
-                helper.display(res, validation.message(validator.errors));
-            } else {
-                product.find(req, res, productModel, helper);
-            }
-        });
+        await validate(req, res, validator);
     },
-    detail: function(req, res, next) {
-        validator = new v(req.params, {
+    detail: async function(req, res, next) {
+        const validator = new nodeInputValidation(req.params, {
             product_id: 'required|integer'
         });
-
-        validator.check().then(function(matched) {
-            if (!matched) {
-                helper.display(res, validation.message(validator.errors));
-            } else {
-                product.find(req, res, productModel, helper);
-            }
-        });
+        await validate(req, res, validator);
     },
-    category: function(req, res, next) {
-        validator = new v(req.params, {
+    category: async function(req, res, next) {
+        const validator = new nodeInputValidation(req.params, {
             category_id: 'required|integer',
             page: 'integer',
             limit: 'integer',
             description_length: 'integer'
         });
-
-        validator.check().then(function(matched) {
-            if (!matched) {
-                helper.display(res, validation.message(validator.errors));
-            } else {
-                product.find(req, res, productModel, helper);
-            }
-        });
+        await validate(req, res, validator);
     },
-    department: function(req, res, next) {
-        validator = new v(req.params, {
+    department: async function(req, res, next) {
+        const validator = new nodeInputValidation(req.params, {
             department_id: 'required|integer',
             page: 'integer',
             limit: 'integer',
             description_length: 'integer'
         });
-
-        validator.check().then(function(matched) {
-            if (!matched) {
-                helper.display(res, validation.message(validator.errors));
-            } else {
-                product.find(req, res, productModel, helper);
-            }
-        });
+        await validate(req, res, validator);
     }
 }

@@ -1,46 +1,46 @@
-const stripeValidation = require(__dirname + "/../modules/StripeValidation");
-const helper = require(__dirname + '/../modules/CustomHelper');
+const path = require("path");
+const stripeValidation = require(path.join(__dirname, '..', 'utils', 'validation', 'StripeValidation'));
+const helper = require(path.join(__dirname, '..', 'utils', 'CustomHelper'));
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const v = require('node-input-validator');
-
-const validation = new stripeValidation();
+const nodeInputValidation = require('node-input-validator');
 
 module.exports = {
-    name: 'Stripe',
-    charge: function(req, res, next) {
-        // Set validation rule
-        validator = new v(req.body, {
-            stripeToken: 'required',
-            order_id: 'required|integer',
-            description: 'required',
-            amount: 'required|integer'
-        });
+    async charge(req, res) {
+        try {
+            // Validation
+            const validationRules = {
+                stripeToken: 'required',
+                order_id: 'required|integer',
+                description: 'required',
+                amount: 'required|integer'
+            };
 
-        // Check validation
-        validator.check().then(function(matched) {
-            if (!matched) {
-                helper.display(res, validation.message(validator.errors));
-            } else {
-                // Setting charge data
-                stripe.charges.create({
-                    amount: req.body.amount, // 100
-                    currency: 'usd',
-                    source: req.body.stripeToken, //tok_visa
-                    metadata: {
-                        'order_id': req.body.order_id
-                    },
-                    description: req.body.description // text
-                }, function(err, charge) {
-                    if (!err) {
-                        helper.display(res, charge, 200);
-                    } else {
-                        helper.display(res, {
-                            'code': 'STR_03',
-                            'message': err.message
-                        });
-                    }
-                });
+            const validator = new nodeInputValidation(req.body, validationRules);
+            const isValid = await validator.check();
+            if (!isValid) {
+                return helper.display(res, stripeValidation.message(validator.errors));
             }
-        });
+
+            // Sanitize input parameters
+            const amount = parseInt(req.body.amount);
+            const orderId = parseInt(req.body.order_id);
+
+            // Create Stripe charge
+            const charge = await stripe.charges.create({
+                amount: amount,
+                currency: 'usd',
+                source: req.body.stripeToken,
+                metadata: {'order_id': orderId},
+                description: req.body.description
+            });
+
+            helper.display(res, charge, 200);
+        } catch (error) {
+            if (error.type === 'StripeInvalidRequestError') {
+                helper.display(res, {'code': 'STR_03', 'message': error.message});
+            } else {
+                helper.display(res, {'code': 'INTERNAL_ERROR', 'message': 'An internal error occurred'});
+            }
+        }
     }
 }

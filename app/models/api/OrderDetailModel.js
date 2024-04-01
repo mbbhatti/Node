@@ -13,37 +13,31 @@ model.table_name = table;
  * @return string|object  
  */
 model.insertOrderDetail = async function(data, orderId) {
-    fields = 'item_id, order_id, product_id, attributes, product_name, quantity, unit_cost';
-    values = '';
+    const fields = ['item_id', 'order_id', 'product_id', 'attributes', 'product_name', 'quantity', 'unit_cost'];
+    let values = [];
 
-    for (i = 0; i < data.length; i++) {
-        temp = '("' +
-            data[i].item_id +
-            '", "' + orderId +
-            '","' + data[i].product_id +
-            '","' + data[i].attributes +
-            '","' + data[i].name +
-            '","' + data[i].quantity +
-            '","' + data[i].price +
-            '")';
-
-        values = values.concat(temp + ',');
-    }
-
-    //-- Remove the last character
-    values = values.substr(0, values.length - 1);
-
-    sql = "INSERT INTO " + table + " (" + fields + ") VALUES " + values;
-
-    return await this.db.query(sql).then(results => {
-        if (results.length > 0) {
-            return results[0];
-        } else {
-            return results;
-        }
-    }).catch(function(err) {
-        throw (err.original.sqlMessage);
+    data.forEach(item => {
+        const temp = [
+            `"${item.item_id}"`,
+            `"${orderId}"`,
+            `"${item.product_id}"`,
+            `"${item.attributes}"`,
+            `"${item.name}"`,
+            `"${item.quantity}"`,
+            `"${item.price}"`
+        ];
+        values.push(`(${temp.join(', ')})`);
     });
+
+    const sql = `INSERT INTO ${table} (${fields.join(', ')}) VALUES ${values.join(', ')}`;
+
+    try {
+        const results = await this.db.query(sql);
+
+        return results.length > 0 ? results[0] : results;
+    } catch (err) {
+        throw err.original.sqlMessage;
+    }
 };
 
 module.exports = model;
