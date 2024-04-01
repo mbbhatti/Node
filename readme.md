@@ -6,11 +6,8 @@ Node application.
 - Express >= 4.17.1
 - MySQL >= 5.* 
 
-# Installation 
-Please check you have node installed on your system then download project through this GitHub URL.
-- git clone https://github.com/mbbhatti/node.git
-
-To get all required packages run this command.
+# Installation
+To get all required packages run.
 - npm install 
 
 # Configuration
