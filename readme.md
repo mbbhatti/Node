@@ -8,35 +8,88 @@ Node based API application.
 
 # Installation 
 Please check you have node installed on your system then download project through this GitHub URL.
-- git clone https://github.com/mbbhatti/turing.git
+- git clone https://github.com/mbbhatti/node.git
 
 To get all required packages run this command.
 - npm install 
 
 # Configuration
-Get database form here https://github.com/zandoan/turing-backend/tree/master/database
-Use this command to create .env file and make setting for email, database, auth token etc. 
-- npm run copy 
+Get database form migration folder or https://github.com/zandoan/turing-backend/tree/master/database
+- npm run copy to create .env file
 
 
 # Architecture
-- app/Controllers contains all required application controllers for individual module.
-- app/Models has base and individual associated table model for business logics.
-- app/Modules contains custom modules validation, handler and helper files.
-- .env file will contain the database, e-mail, auth token and testing configuration. 
-- doc file contains application documents
-- Routes defines endpoints for all APIs with respect of controllers.
-- test has all test cases for the main functions of the system.
-- app.js used express framework for request/response, routes and database connection.
+project_root/
+│
+├── package.json
+├── README.md
+├── .gitignore
+├── .env
+├── config/
+│   ├── index.js
+│   ├── swagger.js
+│   ├── model.js
+│   └── database.js
+│
+├── src/
+│   ├── index.js
+│   ├── app.js
+│   ├── routes/
+│   │   ├── index.js
+│   │   └── customer.js
+│   │   └── order.js
+│   │   └── product.js
+│   │   └── shoppingCart.js
+│   │   └── stripe.js
+│   ├── controllers/
+│   │   └── customerController.js
+│   │   └── orderController.js
+│   │   └── productController.js
+│   │   └── shoppingCartController.js
+│   │   └── stripeController.js
+│   ├── models/
+│   |   └── baseModel.js
+│   |   └── ├── api/
+│   │         └── customerModel.js
+│   │         └── orderModel.js
+│   │         └── productModel.js
+│   │         └── shoppingCartModel.js
+│   │         └── stripeModel.js
+│   ├── utils/
+│   │   └── customHelper.js
+│   │   └── tokenVerification.js
+│   └── ├── handler/
+│         └── customerHandler.js
+│         └── orderHandler.js
+│         └── productHandler.js
+│   └── ├── validation/
+│         └── customerValidation.js
+│         └── orderValidation.js
+│         └── productValidation.js
+│         └── shoppingCartValidation.js
+│         └── striprValidation.js
+│
+├── tests/
+│   ├── unit/
+│     └── test-customer.js
+│     └── test-order.js
+│     └── test-product.js
+│     └── test-shoppingCart.js
+│     └── test-stripe.js
+│
+├── migrations/
+│   └── database.sql
+├── docs/
+│     └── customer.js
+│     └── order.js
+│     └── product.js
+│     └── shoppingCart.js
+│     └── stripe.js
 
-# Documentation 
-Descriptive Detail
-- https://github.com/mbbhatti/turing/blob/master/doc/API-Documentation.pdf
-Response Detail
-- https://github.com/mbbhatti/turing/blob/master/doc/API-Documentation.docx
+# Api Documentation 
+- http://localhost:5000/docs/
 
 # Run || Test
-Use this command on localhost
-- npm start/node app.js: it will provide a URL to run application.
-- npm test: It will use for test cases and you can uncomment console.log () to check api response for couple of main features. 
+- npm start OR node app.js to run application.
+- npm test for test cases.
 - DEBUG=express* node app.js command can also be used to get color detail of application flow in gitbash.
