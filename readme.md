@@ -1,5 +1,5 @@
 # About
-Node based API application.
+Node application.
 
 # Requirements 
 - Node >= 11.11.0
@@ -16,75 +16,6 @@ To get all required packages run this command.
 # Configuration
 Get database form migration folder or https://github.com/zandoan/turing-backend/tree/master/database
 - npm run copy to create .env file
-
-
-# Architecture
-project_root/
-│
-├── package.json
-├── README.md
-├── .gitignore
-├── .env
-├── config/
-│   ├── index.js
-│   ├── swagger.js
-│   ├── model.js
-│   └── database.js
-│
-├── src/
-│   ├── index.js
-│   ├── app.js
-│   ├── routes/
-│   │   ├── index.js
-│   │   └── customer.js
-│   │   └── order.js
-│   │   └── product.js
-│   │   └── shoppingCart.js
-│   │   └── stripe.js
-│   ├── controllers/
-│   │   └── customerController.js
-│   │   └── orderController.js
-│   │   └── productController.js
-│   │   └── shoppingCartController.js
-│   │   └── stripeController.js
-│   ├── models/
-│   |   └── baseModel.js
-│   |   └── ├── api/
-│   │         └── customerModel.js
-│   │         └── orderModel.js
-│   │         └── productModel.js
-│   │         └── shoppingCartModel.js
-│   │         └── stripeModel.js
-│   ├── utils/
-│   │   └── customHelper.js
-│   │   └── tokenVerification.js
-│   └── ├── handler/
-│         └── customerHandler.js
-│         └── orderHandler.js
-│         └── productHandler.js
-│   └── ├── validation/
-│         └── customerValidation.js
-│         └── orderValidation.js
-│         └── productValidation.js
-│         └── shoppingCartValidation.js
-│         └── striprValidation.js
-│
-├── tests/
-│   ├── unit/
-│     └── test-customer.js
-│     └── test-order.js
-│     └── test-product.js
-│     └── test-shoppingCart.js
-│     └── test-stripe.js
-│
-├── migrations/
-│   └── database.sql
-├── docs/
-│     └── customer.js
-│     └── order.js
-│     └── product.js
-│     └── shoppingCart.js
-│     └── stripe.js
 
 # Api Documentation 
 - http://localhost:5000/docs/
